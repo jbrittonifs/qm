@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QM Study Tool - Quantitative Methods</title>
+
+<!-- MathJax for equation rendering -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  startup: { typeset: true }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<!-- Plotly for graphing -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+<!-- math.js for function evaluation -->
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.2.1/lib/browser/math.js"></script>
+
+<!-- Nerdamer for symbolic math -->
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/nerdamer.core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Algebra.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Calculus.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Solve.js"></script>
+
+<style>
+/* ========== RESET & BASE ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ========== HEADER ========== */
+header {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  color: white;
+  padding: 1.5rem 2rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+header p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.15rem;
+}
+
+/* ========== TABS ========== */
+nav {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+nav button {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.75);
+  border: none;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+nav button:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+nav button.active {
+  background: #f0f4f8;
+  color: #1a365d;
+  font-weight: 600;
+}
+
+/* ========== MAIN CONTENT ========== */
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ========== CARDS ========== */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.card h2 {
+  font-size: 1.25rem;
+  color: #1a365d;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.card h3 {
+  font-size: 1.05rem;
+  color: #2d3748;
+  margin: 1rem 0 0.5rem;
+}
+
+/* ========== RULE CARDS ========== */
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.rule-card {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #3182ce;
+}
+
+.rule-card h4 {
+  font-size: 0.9rem;
+  color: #2c5282;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.rule-card .rule-item {
+  padding: 0.35rem 0;
+  font-size: 1rem;
+}
+
+/* ========== FORMS & INPUTS ========== */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.35rem;
+}
+
+.input-group input, .input-group select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: 'Consolas', 'Courier New', monospace;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus, .input-group select:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.hint a {
+  color: #3182ce;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.hint a:hover {
+  text-decoration: underline;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary {
+  background: #3182ce;
+  color: white;
+}
+
+.btn-primary:hover { background: #2c5282; }
+
+.btn-secondary {
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+.btn-secondary:hover { background: #e2e8f0; }
+
+.btn-success {
+  background: #38a169;
+  color: white;
+}
+
+.btn-success:hover { background: #2f855a; }
+
+.btn-warning {
+  background: #dd6b20;
+  color: white;
+}
+
+.btn-warning:hover { background: #c05621; }
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* ========== SOLUTION OUTPUT ========== */
+.solution-output {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  display: none;
+}
+
+.solution-output.visible {
+  display: block;
+}
+
+.step {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #3182ce;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+/* ========== QUIZ ========== */
+.quiz-container {
+  margin-top: 1rem;
+}
+
+.quiz-question {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-question .q-text {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.quiz-option {
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  font-size: 0.95rem;
+}
+
+.quiz-option:hover {
+  border-color: #3182ce;
+  background: #ebf8ff;
+}
+
+.quiz-option.correct {
+  border-color: #38a169;
+  background: #f0fff4;
+  color: #22543d;
+}
+
+.quiz-option.incorrect {
+  border-color: #e53e3e;
+  background: #fff5f5;
+  color: #742a2a;
+}
+
+.quiz-option.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.quiz-feedback {
+  margin-top: 0.6rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.quiz-feedback.correct {
+  display: block;
+  background: #f0fff4;
+  color: #22543d;
+  border: 1px solid #c6f6d5;
+}
+
+.quiz-feedback.incorrect {
+  display: block;
+  background: #fff5f5;
+  color: #742a2a;
+  border: 1px solid #fed7d7;
+}
+
+.quiz-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.quiz-input-row input {
+  padding: 0.5rem 0.7rem;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 6px;
+  font-family: 'Consolas', monospace;
+  font-size: 0.95rem;
+  width: 200px;
+}
+
+.score-bar {
+  background: #edf2f7;
+  border-radius: 20px;
+  height: 10px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+
+.score-bar-fill {
+  background: linear-gradient(90deg, #3182ce, #38a169);
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.5s ease;
+}
+
+.score-text {
+  text-align: center;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* ========== TOGGLE SECTIONS ========== */
+.section-toggle {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+  background: #edf2f7;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.section-toggle button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: #4a5568;
+  transition: all 0.2s;
+}
+
+.section-toggle button.active {
+  background: white;
+  color: #1a365d;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sub-section {
+  display: none;
+}
+
+.sub-section.active {
+  display: block;
+}
+
+/* ========== PLOTLY GRAPH ========== */
+.graph-container {
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+/* ========== ERROR MESSAGES ========== */
+.error-msg {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  display: none;
+}
+
+.error-msg.visible {
+  display: block;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 640px) {
+  header { padding: 1rem 1rem 0; }
+  header h1 { font-size: 1.3rem; }
+  main { padding: 1rem; }
+  nav button { padding: 0.5rem 0.8rem; font-size: 0.78rem; }
+  .card { padding: 1rem; }
+  .rules-grid { grid-template-columns: 1fr; }
+  .input-row { grid-template-columns: 1fr; }
+}
+
+/* ========== MISC ========== */
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.text-muted { color: #718096; font-size: 0.85rem; }
+.text-center { text-align: center; }
+.hidden { display: none; }
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+table.data-table th, table.data-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+table.data-table th {
+  background: #edf2f7;
+  font-weight: 600;
+  color: #2d3748;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <h1>Quantitative Methods</h1>
+  <p>University of York &mdash; Dr Jack Britton</p>
+  <nav id="main-nav">
+    <button class="active" data-tab="keyfacts">Key Facts</button>
+    <button data-tab="graphing">Graph Drawing</button>
+    <button data-tab="lagrangian">Lagrangian Solver</button>
+    <button data-tab="stationary">3D Stationary Points</button>
+    <button data-tab="homogeneity">Homogeneity</button>
+  </nav>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main>
+
+<!-- ============================================================ -->
+<!-- TAB 1: KEY FACTS                                             -->
+<!-- ============================================================ -->
+<div id="tab-keyfacts" class="tab-content active">
+
+  <div class="section-toggle">
+    <button class="active" data-sub="kf-reference">Reference</button>
+    <button data-sub="kf-quiz">Test Yourself</button>
+  </div>
+
+  <!-- REFERENCE SUB-SECTION -->
+  <div id="kf-reference" class="sub-section active">
+
+    <!-- INDICES RULES -->
+    <div class="card">
+      <h2>Indices Rules</h2>
+      <div class="rules-grid">
+        <div class="rule-card">
+          <h4>Multiplication</h4>
+          <div class="rule-item">\( x^a \cdot x^b = x^{a+b} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Division</h4>
+          <div class="rule-item">\( \dfrac{x^a}{x^b} = x^{a-b} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Power of a Power</h4>
+          <div class="rule-item">\( (x^a)^b = x^{ab} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Zero Exponent</h4>
+          <div class="rule-item">\( x^0 = 1 \quad (x \neq 0) \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Negative Exponent</h4>
+          <div class="rule-item">\( x^{-a} = \dfrac{1}{x^a} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Fractional Exponent</h4>
+          <div class="rule-item">\( x^{a/b} = \sqrt[b]{x^a} = \left(\sqrt[b]{x}\right)^a \)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG & EXP RULES -->
+    <div class="card">
+      <h2>Log &amp; Exponential Facts</h2>
+      <div class="rules-grid">
+        <div class="rule-card">
+          <h4>Product Rule</h4>
+          <div class="rule-item">\( \ln(ab) = \ln a + \ln b \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Quotient Rule</h4>
+          <div class="rule-item">\( \ln\!\left(\dfrac{a}{b}\right) = \ln a - \ln b \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Power Rule</h4>
+          <div class="rule-item">\( \ln(a^n) = n \ln a \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Key Values</h4>
+          <div class="rule-item">\( \ln e = 1, \quad \ln 1 = 0 \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Inverse Relationships</h4>
+          <div class="rule-item">\( e^{\ln x} = x, \quad \ln(e^x) = x \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Exponential Growth</h4>
+          <div class="rule-item">\( e^{a+b} = e^a \cdot e^b, \quad e^{-a} = \dfrac{1}{e^a} \)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIFFERENTIATION RULES -->
+    <div class="card">
+      <h2>Differentiation Rules</h2>
+      <div class="rules-grid">
+        <div class="rule-card">
+          <h4>Power Rule</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[x^n\right] = n x^{n-1} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Constant Multiple</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[cf(x)\right] = c\,f'(x) \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Sum / Difference</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[f \pm g\right] = f'(x) \pm g'(x) \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Product Rule</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[f \cdot g\right] = f'g + fg' \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Quotient Rule</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\!\left[\dfrac{f}{g}\right] = \dfrac{f'g - fg'}{g^2} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Chain Rule</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[f(g(x))\right] = f'(g(x)) \cdot g'(x) \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Exponential</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[e^{f(x)}\right] = f'(x) \cdot e^{f(x)} \)</div>
+        </div>
+        <div class="rule-card">
+          <h4>Logarithm</h4>
+          <div class="rule-item">\( \dfrac{d}{dx}\left[\ln f(x)\right] = \dfrac{f'(x)}{f(x)} \)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D STATIONARY POINT RULES -->
+    <div class="card">
+      <h2>Stationary Points of 3D Functions</h2>
+      <p class="mb-2">For a function \(f(x, y)\), stationary points occur where \(f_x = 0\) and \(f_y = 0\). To classify them, compute the <strong>Hessian determinant</strong>:</p>
+      <div class="rule-card mb-2" style="border-left-color: #dd6b20;">
+        <h4>Hessian</h4>
+        <div class="rule-item">\( H = f_{xx} \cdot f_{yy} - (f_{xy})^2 \)</div>
+      </div>
+      <div class="rules-grid">
+        <div class="rule-card" style="border-left-color: #38a169;">
+          <h4>Maximum</h4>
+          <div class="rule-item">\( H > 0 \) and \( f_{xx} < 0 \)</div>
+        </div>
+        <div class="rule-card" style="border-left-color: #38a169;">
+          <h4>Minimum</h4>
+          <div class="rule-item">\( H > 0 \) and \( f_{xx} > 0 \)</div>
+        </div>
+        <div class="rule-card" style="border-left-color: #e53e3e;">
+          <h4>Saddle Point</h4>
+          <div class="rule-item">\( H < 0 \)</div>
+        </div>
+        <div class="rule-card" style="border-left-color: #718096;">
+          <h4>Inconclusive</h4>
+          <div class="rule-item">\( H = 0 \)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCAVITY / CONVEXITY -->
+    <div class="card">
+      <h2>Concavity &amp; Convexity</h2>
+      <div class="rules-grid">
+        <div class="rule-card" style="border-left-color: #38a169;">
+          <h4>Concave (curves down)</h4>
+          <div class="rule-item">\( f''(x) < 0 \)</div>
+        </div>
+        <div class="rule-card" style="border-left-color: #dd6b20;">
+          <h4>Convex (curves up)</h4>
+          <div class="rule-item">\( f''(x) > 0 \)</div>
+        </div>
+        <div class="rule-card" style="border-left-color: #805ad5;">
+          <h4>Inflection Point</h4>
+          <div class="rule-item">\( f''(x) = 0 \) (and sign change)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUIZ SUB-SECTION -->
+  <div id="kf-quiz" class="sub-section">
+    <div class="card">
+      <h2>Test Your Knowledge</h2>
+      <p class="text-muted mb-2">Answer each question. Your score updates as you go.</p>
+      <div class="score-text" id="kf-score-text">Score: 0 / 0</div>
+      <div class="score-bar"><div class="score-bar-fill" id="kf-score-bar" style="width:0%"></div></div>
+      <div class="btn-group mb-2">
+        <button class="btn btn-primary" onclick="generateKeyFactsQuiz()">New Quiz</button>
+      </div>
+      <div id="kf-quiz-container" class="quiz-container"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 2: GRAPH DRAWING                                         -->
+<!-- ============================================================ -->
+<div id="tab-graphing" class="tab-content">
+
+  <div class="section-toggle">
+    <button class="active" data-sub="gd-solver">Graph &amp; Analyse</button>
+    <button data-sub="gd-quiz">Test Yourself</button>
+  </div>
+
+  <div id="gd-solver" class="sub-section active">
+    <div class="card">
+      <h2>Graph Drawing &amp; 7-Point Analysis</h2>
+      <p class="text-muted mb-2">Enter a function of \(x\) below. Use standard notation: <code>x^3</code>, <code>sqrt(x)</code>, <code>exp(x)</code>, <code>log(x)</code> for ln. Use <code>*</code> for multiplication.</p>
+      <div class="input-group">
+        <label>f(x) =</label>
+        <input type="text" id="graph-func" placeholder="e.g. x^3 - 6*x^2 + 9*x" value="x^3 - 6*x^2 + 9*x">
+        <div class="hint">Try an example:
+          <a href="#" onclick="setGraphExample('x^3 - 6*x^2 + 9*x', -2, 8); return false;">Cubic</a> |
+          <a href="#" onclick="setGraphExample('x^4 - 8*x^2 + 12', -4, 4); return false;">Quartic</a> |
+          <a href="#" onclick="setGraphExample('exp(x) - 2*x', -2, 4); return false;">Exponential</a> |
+          <a href="#" onclick="setGraphExample('log(x^2 + 1)', -5, 5); return false;">Log</a>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>x min</label>
+          <input type="number" id="graph-xmin" value="-2">
+        </div>
+        <div class="input-group">
+          <label>x max</label>
+          <input type="number" id="graph-xmax" value="8">
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="drawGraph()">Plot &amp; Analyse</button>
+        <button class="btn btn-secondary" onclick="clearGraph()">Clear</button>
+      </div>
+      <div id="graph-error" class="error-msg"></div>
+      <div id="graph-plot" class="graph-container"></div>
+      <div id="graph-analysis" class="solution-output"></div>
+    </div>
+  </div>
+
+  <div id="gd-quiz" class="sub-section">
+    <div class="card">
+      <h2>Test Your Graph Drawing Skills</h2>
+      <p class="text-muted mb-2">Analyse the function and answer the questions.</p>
+      <div class="score-text" id="gd-score-text">Score: 0 / 0</div>
+      <div class="score-bar"><div class="score-bar-fill" id="gd-score-bar" style="width:0%"></div></div>
+      <div class="btn-group mb-2">
+        <button class="btn btn-primary" onclick="generateGraphQuiz()">New Question</button>
+      </div>
+      <div id="gd-quiz-container" class="quiz-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 3: LAGRANGIAN SOLVER                                     -->
+<!-- ============================================================ -->
+<div id="tab-lagrangian" class="tab-content">
+
+  <div class="section-toggle">
+    <button class="active" data-sub="lg-solver">Solver</button>
+    <button data-sub="lg-quiz">Test Yourself</button>
+  </div>
+
+  <div id="lg-solver" class="sub-section active">
+    <div class="card">
+      <h2>Lagrangian Solver</h2>
+      <p class="text-muted mb-2">Solve constrained optimisation problems of the form: maximise/minimise \(f(x,y) = A\,x^a\,y^b\) subject to \(p_1 x + p_2 y = M\).</p>
+      <div class="hint mb-2">Load an example:
+        <a href="#" onclick="setLgExample('min',1,0.5,0.5,10,15,120); return false;">Cost min (Exam Q3a)</a> |
+        <a href="#" onclick="setLgExample('max',1,0.5,0.5,2,3,100); return false;">Utility max</a> |
+        <a href="#" onclick="setLgExample('min',1,0.25,0.75,40,10,100); return false;">Resit Q3a</a>
+      </div>
+
+      <div class="input-group">
+        <label>Problem type</label>
+        <select id="lg-type">
+          <option value="max">Maximise</option>
+          <option value="min">Minimise</option>
+        </select>
+      </div>
+
+      <h3>Objective: \(f(x,y) = A\,x^a\,y^b\)</h3>
+      <div class="input-row">
+        <div class="input-group">
+          <label>A</label>
+          <input type="number" id="lg-A" value="1" step="any">
+        </div>
+        <div class="input-group">
+          <label>a (power of x)</label>
+          <input type="number" id="lg-a" value="0.5" step="any">
+        </div>
+        <div class="input-group">
+          <label>b (power of y)</label>
+          <input type="number" id="lg-b" value="0.5" step="any">
+        </div>
+      </div>
+
+      <h3>Constraint: \(p_1 x + p_2 y = M\)</h3>
+      <div class="input-row">
+        <div class="input-group">
+          <label>\(p_1\) (price/cost of x)</label>
+          <input type="number" id="lg-p1" value="10" step="any">
+        </div>
+        <div class="input-group">
+          <label>\(p_2\) (price/cost of y)</label>
+          <input type="number" id="lg-p2" value="15" step="any">
+        </div>
+        <div class="input-group">
+          <label>M (budget / output target)</label>
+          <input type="number" id="lg-M" value="120" step="any">
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="solveLagrangian()">Solve Step-by-Step</button>
+        <button class="btn btn-secondary" onclick="clearLagrangian()">Clear</button>
+      </div>
+      <div id="lg-error" class="error-msg"></div>
+      <div id="lg-solution" class="solution-output"></div>
+    </div>
+  </div>
+
+  <div id="lg-quiz" class="sub-section">
+    <div class="card">
+      <h2>Test Your Lagrangian Skills</h2>
+      <p class="text-muted mb-2">Solve the constrained optimisation problem step by step.</p>
+      <div class="score-text" id="lg-score-text">Score: 0 / 0</div>
+      <div class="score-bar"><div class="score-bar-fill" id="lg-score-bar" style="width:0%"></div></div>
+      <div class="btn-group mb-2">
+        <button class="btn btn-primary" onclick="generateLagrangianQuiz()">New Question</button>
+      </div>
+      <div id="lg-quiz-container" class="quiz-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 4: 3D STATIONARY POINTS                                  -->
+<!-- ============================================================ -->
+<div id="tab-stationary" class="tab-content">
+
+  <div class="section-toggle">
+    <button class="active" data-sub="sp-solver">Solver</button>
+    <button data-sub="sp-quiz">Test Yourself</button>
+  </div>
+
+  <div id="sp-solver" class="sub-section active">
+    <div class="card">
+      <h2>3D Stationary Points Finder</h2>
+      <p class="text-muted mb-2">Enter a function of \(x\) and \(y\). Use <code>*</code> for multiplication. For example: <code>x^3 + y^3 - 3*x*y</code></p>
+      <div class="input-group">
+        <label>\(f(x,y) =\)</label>
+        <input type="text" id="sp-func" placeholder="e.g. x^3 + y^3 - 3*x*y" value="x^3 + y^3 - 3*x*y">
+        <div class="hint">Try an example:
+          <a href="#" onclick="document.getElementById('sp-func').value='x^3 + y^3 - 3*x*y'; return false;">Cubic</a> |
+          <a href="#" onclick="document.getElementById('sp-func').value='x^2 + y^2 - 4*x - 6*y + 13'; return false;">Quadratic (min)</a> |
+          <a href="#" onclick="document.getElementById('sp-func').value='x^2 - y^2'; return false;">Saddle</a> |
+          <a href="#" onclick="document.getElementById('sp-func').value='x^2 + x*y + y^2 - 3*x'; return false;">Mixed terms</a>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="solveStationaryPoints()">Find Stationary Points</button>
+        <button class="btn btn-secondary" onclick="clearStationary()">Clear</button>
+      </div>
+      <div id="sp-error" class="error-msg"></div>
+      <div id="sp-solution" class="solution-output"></div>
+    </div>
+  </div>
+
+  <div id="sp-quiz" class="sub-section">
+    <div class="card">
+      <h2>Test Your Skills</h2>
+      <p class="text-muted mb-2">Find and classify the stationary points of the given function.</p>
+      <div class="score-text" id="sp-score-text">Score: 0 / 0</div>
+      <div class="score-bar"><div class="score-bar-fill" id="sp-score-bar" style="width:0%"></div></div>
+      <div class="btn-group mb-2">
+        <button class="btn btn-primary" onclick="generateStationaryQuiz()">New Question</button>
+      </div>
+      <div id="sp-quiz-container" class="quiz-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 5: HOMOGENEITY                                           -->
+<!-- ============================================================ -->
+<div id="tab-homogeneity" class="tab-content">
+
+  <div class="section-toggle">
+    <button class="active" data-sub="hg-solver">Solver</button>
+    <button data-sub="hg-quiz">Test Yourself</button>
+  </div>
+
+  <div id="hg-solver" class="sub-section active">
+    <div class="card">
+      <h2>Homogeneity Solver</h2>
+      <p class="text-muted mb-2">Test whether a Cobb-Douglas function \(f(x,y) = A\,x^a\,y^b\) is homogeneous, using both Euler's theorem and the scaling method.</p>
+      <div class="hint mb-2">Load an example:
+        <a href="#" onclick="setHgExample(1,0.75,0.75); return false;">Exam Q2 (IRS)</a> |
+        <a href="#" onclick="setHgExample(1,0.5,0.5); return false;">CRS</a> |
+        <a href="#" onclick="setHgExample(1,0.3,0.5); return false;">DRS</a> |
+        <a href="#" onclick="setHgExample(1,1,1); return false;">Resit Q2</a>
+      </div>
+
+      <h3>Function: \(f(x,y) = A\,x^a\,y^b\)</h3>
+      <div class="input-row">
+        <div class="input-group">
+          <label>A</label>
+          <input type="number" id="hg-A" value="1" step="any">
+        </div>
+        <div class="input-group">
+          <label>a (power of x)</label>
+          <input type="number" id="hg-a" value="0.75" step="any">
+        </div>
+        <div class="input-group">
+          <label>b (power of y)</label>
+          <input type="number" id="hg-b" value="0.75" step="any">
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="solveHomogeneity()">Solve Step-by-Step</button>
+        <button class="btn btn-secondary" onclick="clearHomogeneity()">Clear</button>
+      </div>
+      <div id="hg-error" class="error-msg"></div>
+      <div id="hg-solution" class="solution-output"></div>
+    </div>
+  </div>
+
+  <div id="hg-quiz" class="sub-section">
+    <div class="card">
+      <h2>Test Your Knowledge</h2>
+      <p class="text-muted mb-2">Determine the degree of homogeneity and returns to scale.</p>
+      <div class="score-text" id="hg-score-text">Score: 0 / 0</div>
+      <div class="score-bar"><div class="score-bar-fill" id="hg-score-bar" style="width:0%"></div></div>
+      <div class="btn-group mb-2">
+        <button class="btn btn-primary" onclick="generateHomogeneityQuiz()">New Question</button>
+      </div>
+      <div id="hg-quiz-container" class="quiz-container"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ================================================================
+// NAVIGATION
+// ================================================================
+document.querySelectorAll('#main-nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.section-toggle').forEach(toggle => {
+  toggle.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const parent = toggle.parentElement;
+      parent.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
+      parent.querySelector('#' + btn.dataset.sub).classList.add('active');
+    });
+  });
+});
+
+// ================================================================
+// UTILITY FUNCTIONS
+// ================================================================
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideError(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+
+function round(val, dp = 4) {
+  return Math.round(val * Math.pow(10, dp)) / Math.pow(10, dp);
+}
+
+function fmtNum(val, dp = 2) {
+  if (Math.abs(val) < 1e-10) return '0';
+  const r = round(val, dp);
+  return Number.isInteger(r) ? r.toString() : r.toFixed(dp).replace(/\.?0+$/, '');
+}
+
+function retypeset(el) {
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([el]).catch(() => {});
+  }
+}
+
+// Safe evaluation using math.js
+function safeEval(expr, scope) {
+  try {
+    return math.evaluate(expr, scope);
+  } catch { return NaN; }
+}
+
+// Example setters
+function setGraphExample(func, xmin, xmax) {
+  document.getElementById('graph-func').value = func;
+  document.getElementById('graph-xmin').value = xmin;
+  document.getElementById('graph-xmax').value = xmax;
+}
+
+function setLgExample(type, A, a, b, p1, p2, M) {
+  document.getElementById('lg-type').value = type;
+  document.getElementById('lg-A').value = A;
+  document.getElementById('lg-a').value = a;
+  document.getElementById('lg-b').value = b;
+  document.getElementById('lg-p1').value = p1;
+  document.getElementById('lg-p2').value = p2;
+  document.getElementById('lg-M').value = M;
+}
+
+function setHgExample(A, a, b) {
+  document.getElementById('hg-A').value = A;
+  document.getElementById('hg-a').value = a;
+  document.getElementById('hg-b').value = b;
+}
+
+// ================================================================
+// TAB 1: KEY FACTS QUIZ
+// ================================================================
+let kfScore = { correct: 0, total: 0 };
+
+function updateKfScore() {
+  document.getElementById('kf-score-text').textContent = `Score: ${kfScore.correct} / ${kfScore.total}`;
+  const pct = kfScore.total > 0 ? (kfScore.correct / kfScore.total * 100) : 0;
+  document.getElementById('kf-score-bar').style.width = pct + '%';
+}
+
+function generateKeyFactsQuiz() {
+  kfScore = { correct: 0, total: 0 };
+  updateKfScore();
+
+  const questions = [
+    // INDICES
+    { q: 'Simplify \\(x^3 \\cdot x^5\\)', opts: ['\\(x^{15}\\)', '\\(x^8\\)', '\\(x^2\\)', '\\(2x^8\\)'], ans: 1, expl: '\\(x^a \\cdot x^b = x^{a+b}\\), so \\(x^3 \\cdot x^5 = x^8\\).' },
+    { q: 'Simplify \\(\\dfrac{x^7}{x^3}\\)', opts: ['\\(x^{21}\\)', '\\(x^{10}\\)', '\\(x^4\\)', '\\(x^{7/3}\\)'], ans: 2, expl: '\\(x^a / x^b = x^{a-b}\\), so \\(x^{7-3} = x^4\\).' },
+    { q: 'Simplify \\((x^2)^4\\)', opts: ['\\(x^6\\)', '\\(x^8\\)', '\\(x^{16}\\)', '\\(2x^4\\)'], ans: 1, expl: '\\((x^a)^b = x^{ab}\\), so \\((x^2)^4 = x^8\\).' },
+    { q: 'What is \\(x^{-3}\\)?', opts: ['\\(-x^3\\)', '\\(\\frac{1}{x^3}\\)', '\\(\\frac{x}{3}\\)', '\\(x^{1/3}\\)'], ans: 1, expl: '\\(x^{-a} = \\frac{1}{x^a}\\).' },
+    { q: 'What is \\(8^{2/3}\\)?', opts: ['4', '6', '\\(\\frac{16}{3}\\)', '2'], ans: 0, expl: '\\(8^{2/3} = (\\sqrt[3]{8})^2 = 2^2 = 4\\).' },
+    { q: 'What is \\(5^0\\)?', opts: ['0', '5', '1', 'undefined'], ans: 2, expl: 'Any non-zero number raised to the power 0 equals 1.' },
+    // LOGS
+    { q: 'Simplify \\(\\ln(e^5)\\)', opts: ['\\(5e\\)', '5', '\\(e^5\\)', '1'], ans: 1, expl: '\\(\\ln(e^x) = x\\), so \\(\\ln(e^5) = 5\\).' },
+    { q: 'Simplify \\(\\ln a + \\ln b\\)', opts: ['\\(\\ln(a+b)\\)', '\\(\\ln(ab)\\)', '\\(\\ln a \\cdot \\ln b\\)', '\\((\\ln a)^b\\)'], ans: 1, expl: '\\(\\ln a + \\ln b = \\ln(ab)\\) by the product rule for logarithms.' },
+    { q: 'Simplify \\(\\ln(x^4)\\)', opts: ['\\(4\\ln x\\)', '\\(\\ln(4x)\\)', '\\(4 + \\ln x\\)', '\\((\\ln x)^4\\)'], ans: 0, expl: '\\(\\ln(x^n) = n\\ln x\\).' },
+    { q: 'What is \\(e^{\\ln 7}\\)?', opts: ['\\(\\ln 7\\)', '\\(7e\\)', '7', '1'], ans: 2, expl: '\\(e^{\\ln x} = x\\), so \\(e^{\\ln 7} = 7\\).' },
+    { q: 'What is \\(\\ln 1\\)?', opts: ['1', '0', '\\(e\\)', 'undefined'], ans: 1, expl: '\\(\\ln 1 = 0\\) because \\(e^0 = 1\\).' },
+    // DIFFERENTIATION
+    { q: 'Differentiate \\(f(x) = 5x^4\\)', opts: ['\\(20x^3\\)', '\\(5x^3\\)', '\\(20x^5\\)', '\\(4x^5\\)'], ans: 0, expl: 'Power rule: \\(\\frac{d}{dx}[5x^4] = 5 \\times 4 x^{4-1} = 20x^3\\).' },
+    { q: 'Differentiate \\(f(x) = e^{3x}\\)', opts: ['\\(e^{3x}\\)', '\\(3e^{3x}\\)', '\\(3xe^{3x}\\)', '\\(e^{3}\\)'], ans: 1, expl: 'Chain rule: \\(\\frac{d}{dx}[e^{3x}] = 3e^{3x}\\).' },
+    { q: 'Differentiate \\(f(x) = \\ln(2x)\\)', opts: ['\\(\\frac{2}{x}\\)', '\\(\\frac{1}{x}\\)', '\\(\\frac{1}{2x}\\)', '\\(2\\ln x\\)'], ans: 1, expl: '\\(\\frac{d}{dx}[\\ln(2x)] = \\frac{2}{2x} = \\frac{1}{x}\\). Or note \\(\\ln(2x) = \\ln 2 + \\ln x\\).' },
+    { q: 'If \\(f(x) = x^2 \\cdot e^x\\), what is \\(f\'(x)\\)?', opts: ['\\(2xe^x\\)', '\\(x^2 e^x\\)', '\\(2xe^x + x^2e^x\\)', '\\(e^x(2x+1)\\)'], ans: 2, expl: 'Product rule: \\(f\' = 2x \\cdot e^x + x^2 \\cdot e^x = e^x(2x + x^2)\\).' },
+    // STATIONARY POINTS 3D
+    { q: 'For \\(f(x,y)\\), if \\(H > 0\\) and \\(f_{xx} < 0\\), the point is a:', opts: ['Minimum', 'Maximum', 'Saddle point', 'Inconclusive'], ans: 1, expl: '\\(H > 0\\) and \\(f_{xx} < 0\\) means the point is a maximum.' },
+    { q: 'If the Hessian \\(H < 0\\), the stationary point is a:', opts: ['Maximum', 'Minimum', 'Saddle point', 'Inflection point'], ans: 2, expl: '\\(H < 0\\) always indicates a saddle point.' },
+    { q: 'The Hessian is \\(H = f_{xx}f_{yy} - (f_{xy})^2\\). If \\(f_{xx}=4, f_{yy}=3, f_{xy}=1\\), what is \\(H\\)?', opts: ['11', '13', '7', '12'], ans: 0, expl: '\\(H = 4 \\times 3 - 1^2 = 12 - 1 = 11\\).' },
+    { q: 'A function is concave at \\(x\\) when:', opts: ['\\(f\'(x) = 0\\)', '\\(f\'\'(x) > 0\\)', '\\(f\'\'(x) < 0\\)', '\\(f\'\'(x) = 0\\)'], ans: 2, expl: 'A function is concave where \\(f\'\'(x) < 0\\).' },
+  ];
+
+  // Shuffle and pick 10
+  const shuffled = questions.sort(() => Math.random() - 0.5).slice(0, 10);
+  const container = document.getElementById('kf-quiz-container');
+  container.innerHTML = '';
+  kfScore.total = shuffled.length;
+
+  shuffled.forEach((item, qi) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-question';
+    div.innerHTML = `<div class="q-text">${qi + 1}. ${item.q}</div>
+      <div class="quiz-options" id="kf-opts-${qi}">
+        ${item.opts.map((o, oi) => `<div class="quiz-option" data-qi="${qi}" data-oi="${oi}" onclick="checkKfAnswer(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="kf-fb-${qi}" data-expl="${item.expl.replace(/"/g, '&quot;')}"></div>`;
+    container.appendChild(div);
+  });
+
+  retypeset(container);
+}
+
+function checkKfAnswer(el, qi, chosen, correct) {
+  const opts = document.querySelectorAll(`#kf-opts-${qi} .quiz-option`);
+  opts.forEach(o => { o.classList.add('disabled'); });
+  if (chosen === correct) {
+    el.classList.add('correct');
+    kfScore.correct++;
+    const fb = document.getElementById(`kf-fb-${qi}`);
+    fb.className = 'quiz-feedback correct';
+    fb.innerHTML = 'Correct! ' + fb.dataset.expl;
+  } else {
+    el.classList.add('incorrect');
+    opts[correct].classList.add('correct');
+    const fb = document.getElementById(`kf-fb-${qi}`);
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerHTML = 'Incorrect. ' + fb.dataset.expl;
+  }
+  updateKfScore();
+  retypeset(document.getElementById(`kf-fb-${qi}`));
+}
+
+// ================================================================
+// TAB 2: GRAPH DRAWING
+// ================================================================
+function drawGraph() {
+  hideError('graph-error');
+  const funcStr = document.getElementById('graph-func').value.trim();
+  const xmin = parseFloat(document.getElementById('graph-xmin').value);
+  const xmax = parseFloat(document.getElementById('graph-xmax').value);
+
+  if (!funcStr) { showError('graph-error', 'Please enter a function.'); return; }
+  if (isNaN(xmin) || isNaN(xmax) || xmin >= xmax) { showError('graph-error', 'Invalid x range.'); return; }
+
+  // Compile function
+  let compiled;
+  try {
+    compiled = math.compile(funcStr);
+    compiled.evaluate({ x: 0 }); // test
+  } catch (e) {
+    showError('graph-error', 'Could not parse function. Check syntax. Use * for multiplication.');
+    return;
+  }
+
+  // Generate points
+  const n = 500;
+  const xs = [], ys = [];
+  const step = (xmax - xmin) / n;
+  for (let i = 0; i <= n; i++) {
+    const xv = xmin + i * step;
+    try {
+      const yv = compiled.evaluate({ x: xv });
+      if (isFinite(yv) && Math.abs(yv) < 1e10) {
+        xs.push(xv);
+        ys.push(yv);
+      } else {
+        xs.push(xv);
+        ys.push(null);
+      }
+    } catch {
+      xs.push(xv);
+      ys.push(null);
+    }
+  }
+
+  Plotly.newPlot('graph-plot', [{
+    x: xs, y: ys, type: 'scatter', mode: 'lines',
+    line: { color: '#3182ce', width: 2.5 },
+    connectgaps: false
+  }], {
+    xaxis: { title: 'x', zeroline: true, zerolinecolor: '#aaa', zerolinewidth: 1 },
+    yaxis: { title: 'f(x)', zeroline: true, zerolinecolor: '#aaa', zerolinewidth: 1 },
+    margin: { t: 20, r: 20 },
+    height: 380,
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)'
+  }, { responsive: true });
+
+  // 7-point analysis
+  doSevenPointAnalysis(funcStr, compiled, xmin, xmax);
+}
+
+function doSevenPointAnalysis(funcStr, compiled, xmin, xmax) {
+  const out = document.getElementById('graph-analysis');
+  out.classList.add('visible');
+
+  let html = '';
+
+  // 1. y-intercept
+  try {
+    const y0 = compiled.evaluate({ x: 0 });
+    html += `<div class="step"><div class="step-label">Step 1: Y-intercept (x = 0)</div>
+      \\(f(0) = ${fmtNum(y0)}\\), so the curve crosses the y-axis at \\((0,\\, ${fmtNum(y0)})\\).</div>`;
+  } catch {
+    html += `<div class="step"><div class="step-label">Step 1: Y-intercept</div>Function may not be defined at \\(x=0\\).</div>`;
+  }
+
+  // 2. x-intercepts (numerical)
+  const xIntercepts = findRoots(compiled, xmin, xmax);
+  if (xIntercepts.length > 0) {
+    const rootStr = xIntercepts.map(r => `\\(${fmtNum(r)}\\)`).join(', ');
+    html += `<div class="step"><div class="step-label">Step 2: X-intercepts (y = 0)</div>
+      The function crosses the x-axis at approximately: x = ${rootStr}.</div>`;
+  } else {
+    html += `<div class="step"><div class="step-label">Step 2: X-intercepts</div>No real x-intercepts found in the given range.</div>`;
+  }
+
+  // 3. Undefined points
+  html += `<div class="step"><div class="step-label">Step 3: Undefined points</div>Check whether the function has any discontinuities or asymptotes in the given range.</div>`;
+
+  // 4 & 5. Limits
+  try {
+    const yAtMin = compiled.evaluate({ x: xmin });
+    const yAtMax = compiled.evaluate({ x: xmax });
+    const bigNeg = compiled.evaluate({ x: -1000 });
+    const bigPos = compiled.evaluate({ x: 1000 });
+    html += `<div class="step"><div class="step-label">Step 4: Behaviour at extremes</div>
+      As \\(x \\to -\\infty\\): \\(f(x) \\to ${isFinite(bigNeg) ? fmtNum(bigNeg) : (bigNeg > 0 ? '+\\infty' : '-\\infty')}\\)<br>
+      As \\(x \\to +\\infty\\): \\(f(x) \\to ${isFinite(bigPos) ? fmtNum(bigPos) : (bigPos > 0 ? '+\\infty' : '-\\infty')}\\)</div>`;
+  } catch {
+    html += `<div class="step"><div class="step-label">Step 4: Behaviour at extremes</div>Could not evaluate limits.</div>`;
+  }
+
+  // 5 & 6. Stationary points (numerical)
+  let derivative;
+  try {
+    const dExpr = math.derivative(funcStr, 'x');
+    derivative = dExpr;
+    const dStr = dExpr.toString();
+
+    // Find where derivative = 0
+    const statPts = findRoots(math.compile(dStr), xmin, xmax);
+
+    if (statPts.length > 0) {
+      let spHtml = '';
+      // Second derivative
+      let d2Expr;
+      try { d2Expr = math.derivative(dStr, 'x'); } catch { d2Expr = null; }
+
+      statPts.forEach(sp => {
+        const yVal = compiled.evaluate({ x: sp });
+        let nature = 'unknown';
+        if (d2Expr) {
+          const d2Val = d2Expr.evaluate({ x: sp });
+          if (d2Val < -1e-8) nature = 'local maximum';
+          else if (d2Val > 1e-8) nature = 'local minimum';
+          else nature = 'inflection point (or higher-order)';
+        }
+        spHtml += `\\((${fmtNum(sp)},\\, ${fmtNum(yVal)})\\) &mdash; ${nature}<br>`;
+      });
+
+      html += `<div class="step"><div class="step-label">Step 5: Stationary points (f'(x) = 0)</div>
+        \\(f'(x) = ${dStr}\\)<br><br>${spHtml}</div>`;
+
+      // Concavity
+      if (d2Expr) {
+        const d2Str = d2Expr.toString();
+        html += `<div class="step"><div class="step-label">Step 6: Concavity (f''(x))</div>
+          \\(f''(x) = ${d2Str}\\)<br>
+          The function is <strong>concave</strong> where \\(f''(x) < 0\\) and <strong>convex</strong> where \\(f''(x) > 0\\).</div>`;
+      }
+    } else {
+      html += `<div class="step"><div class="step-label">Step 5: Stationary points</div>No stationary points found in the given range.</div>`;
+    }
+  } catch (e) {
+    html += `<div class="step"><div class="step-label">Step 5: Stationary points</div>Could not compute derivative symbolically. Try a simpler function.</div>`;
+  }
+
+  // 7. Sketch summary
+  html += `<div class="step"><div class="step-label">Step 7: Sketch</div>
+    Use all the information above to sketch the function. The graph is plotted above for reference.</div>`;
+
+  out.innerHTML = html;
+  retypeset(out);
+}
+
+function findRoots(compiled, xmin, xmax, n = 2000) {
+  const roots = [];
+  const step = (xmax - xmin) / n;
+  let prevY;
+  try { prevY = compiled.evaluate({ x: xmin }); } catch { prevY = NaN; }
+
+  for (let i = 1; i <= n; i++) {
+    const xv = xmin + i * step;
+    let yv;
+    try { yv = compiled.evaluate({ x: xv }); } catch { yv = NaN; }
+
+    if (isFinite(prevY) && isFinite(yv) && prevY * yv <= 0) {
+      // Bisection
+      let lo = xv - step, hi = xv;
+      for (let j = 0; j < 50; j++) {
+        const mid = (lo + hi) / 2;
+        const mVal = compiled.evaluate({ x: mid });
+        if (Math.abs(mVal) < 1e-12) { lo = hi = mid; break; }
+        const loVal = compiled.evaluate({ x: lo });
+        if (loVal * mVal < 0) hi = mid; else lo = mid;
+      }
+      const root = round((lo + hi) / 2, 4);
+      if (roots.length === 0 || Math.abs(root - roots[roots.length - 1]) > 0.01) {
+        roots.push(root);
+      }
+    }
+    prevY = yv;
+  }
+  return roots;
+}
+
+function clearGraph() {
+  document.getElementById('graph-plot').innerHTML = '';
+  document.getElementById('graph-analysis').innerHTML = '';
+  document.getElementById('graph-analysis').classList.remove('visible');
+  hideError('graph-error');
+}
+
+// Graph Quiz
+let gdScore = { correct: 0, total: 0 };
+
+function updateGdScore() {
+  document.getElementById('gd-score-text').textContent = `Score: ${gdScore.correct} / ${gdScore.total}`;
+  const pct = gdScore.total > 0 ? (gdScore.correct / gdScore.total * 100) : 0;
+  document.getElementById('gd-score-bar').style.width = pct + '%';
+}
+
+function generateGraphQuiz() {
+  gdScore = { correct: 0, total: 0 };
+  updateGdScore();
+
+  const problems = [
+    { func: 'x^3 - 6*x^2 + 9*x', display: 'f(x) = x^3 - 6x^2 + 9x',
+      questions: [
+        { q: 'What is \\(f(0)\\)?', ans: '0', type: 'input' },
+        { q: 'How many stationary points does this function have?', opts: ['0','1','2','3'], ans: 2, type: 'mc' },
+        { q: 'Where does \\(f(x) \\to\\) as \\(x \\to +\\infty\\)?', opts: ['\\(+\\infty\\)','\\(-\\infty\\)','0','undefined'], ans: 0, type: 'mc' },
+        { q: 'The function crosses the x-axis at \\(x = 0\\) and \\(x =\\) ?', ans: '3', type: 'input' },
+      ]},
+    { func: 'x^4 - 8*x^2 + 12', display: 'f(x) = x^4 - 8x^2 + 12',
+      questions: [
+        { q: 'What is \\(f(0)\\)?', ans: '12', type: 'input' },
+        { q: 'Where does \\(f(x) \\to\\) as \\(x \\to -\\infty\\)?', opts: ['\\(+\\infty\\)','\\(-\\infty\\)','0','12'], ans: 0, type: 'mc' },
+        { q: 'How many stationary points does this function have?', opts: ['1','2','3','4'], ans: 2, type: 'mc' },
+      ]},
+    { func: 'x^3 - 3*x + 2', display: 'f(x) = x^3 - 3x + 2',
+      questions: [
+        { q: 'What is \\(f(0)\\)?', ans: '2', type: 'input' },
+        { q: 'The derivative \\(f\'(x) = 3x^2 - 3\\). Stationary points are at \\(x =\\) ?', opts: ['\\(x = \\pm 1\\)','\\(x = 0\\)','\\(x = \\pm 3\\)','\\(x = 3\\)'], ans: 0, type: 'mc' },
+        { q: 'At \\(x = -1\\), is it a max or min?', opts: ['Maximum','Minimum','Saddle','Inflection'], ans: 0, type: 'mc' },
+        { q: 'At \\(x = 1\\), is it a max or min?', opts: ['Maximum','Minimum','Saddle','Inflection'], ans: 1, type: 'mc' },
+      ]},
+  ];
+
+  const prob = problems[Math.floor(Math.random() * problems.length)];
+  const container = document.getElementById('gd-quiz-container');
+  gdScore.total = prob.questions.length;
+
+  let html = `<div class="quiz-question"><div class="q-text">Consider the function \\(${prob.display}\\)</div></div>`;
+
+  prob.questions.forEach((item, qi) => {
+    if (item.type === 'mc') {
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-options" id="gd-opts-${qi}">
+          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkGdMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
+        </div>
+        <div class="quiz-feedback" id="gd-fb-${qi}"></div></div>`;
+    } else {
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-input-row">
+          <input type="text" id="gd-input-${qi}" placeholder="Your answer">
+          <button class="btn btn-primary" onclick="checkGdInput(${qi}, '${item.ans}')">Check</button>
+        </div>
+        <div class="quiz-feedback" id="gd-fb-${qi}"></div></div>`;
+    }
+  });
+
+  container.innerHTML = html;
+  retypeset(container);
+}
+
+function checkGdMc(el, qi, chosen, correct) {
+  const opts = document.querySelectorAll(`#gd-opts-${qi} .quiz-option`);
+  opts.forEach(o => o.classList.add('disabled'));
+  const fb = document.getElementById(`gd-fb-${qi}`);
+  if (chosen === correct) {
+    el.classList.add('correct');
+    gdScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Correct!';
+  } else {
+    el.classList.add('incorrect');
+    opts[correct].classList.add('correct');
+    fb.className = 'quiz-feedback incorrect';
+    fb.textContent = 'Incorrect.';
+  }
+  updateGdScore();
+}
+
+function checkGdInput(qi, correct) {
+  const input = document.getElementById(`gd-input-${qi}`);
+  const fb = document.getElementById(`gd-fb-${qi}`);
+  const val = input.value.trim();
+  input.disabled = true;
+  if (val === correct || Math.abs(parseFloat(val) - parseFloat(correct)) < 0.01) {
+    gdScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Correct!';
+  } else {
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerHTML = `Incorrect. The answer is ${correct}.`;
+  }
+  updateGdScore();
+}
+
+// ================================================================
+// TAB 3: LAGRANGIAN SOLVER
+// ================================================================
+function solveLagrangian() {
+  hideError('lg-error');
+  const type = document.getElementById('lg-type').value;
+  const A = parseFloat(document.getElementById('lg-A').value);
+  const a = parseFloat(document.getElementById('lg-a').value);
+  const b = parseFloat(document.getElementById('lg-b').value);
+  const p1 = parseFloat(document.getElementById('lg-p1').value);
+  const p2 = parseFloat(document.getElementById('lg-p2').value);
+  const M = parseFloat(document.getElementById('lg-M').value);
+
+  if ([A, a, b, p1, p2, M].some(isNaN) || p1 === 0 || p2 === 0) {
+    showError('lg-error', 'Please fill in all fields with valid numbers. Prices must be non-zero.');
+    return;
+  }
+
+  const sign = type === 'max' ? '+' : '-';
+  const signWord = type === 'max' ? 'maximise' : 'minimise';
+  const signLambda = type === 'max' ? '-' : '+'; // Lagrangian sign convention
+  const lambdaSign = type === 'min' ? '+' : '-';
+
+  // Build display strings
+  const Astr = A === 1 ? '' : fmtNum(A);
+  const funcDisplay = `${Astr}x^{${fmtNum(a)}} y^{${fmtNum(b)}}`;
+  const constraintDisplay = `${fmtNum(p1)}x + ${fmtNum(p2)}y = ${fmtNum(M)}`;
+
+  // Step 1: Write the Lagrangian
+  // For minimisation: L = objective + λ(M - p1*x - p2*y)
+  // For maximisation: L = objective - λ(p1*x + p2*y - M)
+  // We'll use the convention: L = f(x,y) + λ(M - p1*x - p2*y) for both
+  const lagDisplay = `${funcDisplay} + \\lambda(${fmtNum(M)} - ${fmtNum(p1)}x - ${fmtNum(p2)}y)`;
+
+  // Step 2: FOCs
+  // dL/dx = A*a*x^(a-1)*y^b - λ*p1 = 0
+  // dL/dy = A*b*x^a*y^(b-1) - λ*p2 = 0
+  // dL/dλ = M - p1*x - p2*y = 0
+
+  // From FOC1: λ = A*a*x^(a-1)*y^b / p1
+  // From FOC2: λ = A*b*x^a*y^(b-1) / p2
+  // Setting equal: A*a*x^(a-1)*y^b / p1 = A*b*x^a*y^(b-1) / p2
+  // Simplify: a*y / (p1) = b*x / (p2)
+  // So: x = (a*p2*y) / (b*p1)
+
+  // Sub into constraint: p1 * (a*p2*y)/(b*p1) + p2*y = M
+  // a*p2*y/b + p2*y = M
+  // p2*y*(a/b + 1) = M
+  // p2*y*((a+b)/b) = M
+  // y* = M*b / (p2*(a+b))
+  // x* = M*a / (p1*(a+b))
+
+  const xStar = (M * a) / (p1 * (a + b));
+  const yStar = (M * b) / (p2 * (a + b));
+
+  // Lambda
+  const lambdaStar = (A * a * Math.pow(xStar, a - 1) * Math.pow(yStar, b)) / p1;
+
+  // Optimal value
+  const fStar = A * Math.pow(xStar, a) * Math.pow(yStar, b);
+
+  const out = document.getElementById('lg-solution');
+  out.classList.add('visible');
+
+  out.innerHTML = `
+    <div class="step">
+      <div class="step-label">Problem Setup</div>
+      ${signWord} \\(f(x,y) = ${funcDisplay}\\) subject to \\(${constraintDisplay}\\)
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 1: Write the Lagrangian</div>
+      \\[\\mathcal{L} = ${lagDisplay}\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 2: First Order Conditions</div>
+      \\[\\frac{\\partial \\mathcal{L}}{\\partial x} = ${fmtNum(A * a)} \\, x^{${fmtNum(a - 1)}} \\, y^{${fmtNum(b)}} - ${fmtNum(p1)}\\lambda = 0 \\quad \\cdots (1)\\]
+      \\[\\frac{\\partial \\mathcal{L}}{\\partial y} = ${fmtNum(A * b)} \\, x^{${fmtNum(a)}} \\, y^{${fmtNum(b - 1)}} - ${fmtNum(p2)}\\lambda = 0 \\quad \\cdots (2)\\]
+      \\[\\frac{\\partial \\mathcal{L}}{\\partial \\lambda} = ${fmtNum(M)} - ${fmtNum(p1)}x - ${fmtNum(p2)}y = 0 \\quad \\cdots (3)\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 3: Solve for the ratio</div>
+      From (1): \\(\\lambda = \\dfrac{${fmtNum(A * a)} \\, x^{${fmtNum(a - 1)}} \\, y^{${fmtNum(b)}}}{${fmtNum(p1)}}\\)<br><br>
+      From (2): \\(\\lambda = \\dfrac{${fmtNum(A * b)} \\, x^{${fmtNum(a)}} \\, y^{${fmtNum(b - 1)}}}{${fmtNum(p2)}}\\)<br><br>
+      Setting these equal and simplifying:<br>
+      \\[\\frac{${fmtNum(a)} \\cdot y}{${fmtNum(p1)}} = \\frac{${fmtNum(b)} \\cdot x}{${fmtNum(p2)}}\\]
+      \\[x = \\frac{${fmtNum(a)} \\cdot ${fmtNum(p2)}}{${fmtNum(b)} \\cdot ${fmtNum(p1)}} \\, y = ${fmtNum((a * p2) / (b * p1))} \\, y\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 4: Substitute into constraint</div>
+      \\[${fmtNum(p1)} \\cdot ${fmtNum((a * p2) / (b * p1))} y + ${fmtNum(p2)} y = ${fmtNum(M)}\\]
+      \\[${fmtNum(p1 * (a * p2) / (b * p1))} y + ${fmtNum(p2)} y = ${fmtNum(M)}\\]
+      \\[${fmtNum(p1 * (a * p2) / (b * p1) + p2)} y = ${fmtNum(M)}\\]
+      \\[y^* = ${fmtNum(yStar)}\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 5: Find x*</div>
+      \\[x^* = ${fmtNum((a * p2) / (b * p1))} \\times ${fmtNum(yStar)} = ${fmtNum(xStar)}\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Result</div>
+      <strong>Optimal values:</strong> \\(x^* = ${fmtNum(xStar)}\\), \\(y^* = ${fmtNum(yStar)}\\)<br>
+      <strong>Optimal function value:</strong> \\(f(x^*, y^*) = ${fmtNum(fStar)}\\)<br>
+      <strong>Lagrange multiplier:</strong> \\(\\lambda^* = ${fmtNum(lambdaStar, 4)}\\)
+    </div>`;
+
+  retypeset(out);
+}
+
+function clearLagrangian() {
+  document.getElementById('lg-solution').innerHTML = '';
+  document.getElementById('lg-solution').classList.remove('visible');
+  hideError('lg-error');
+}
+
+// Lagrangian Quiz
+let lgScore = { correct: 0, total: 0 };
+
+function updateLgScore() {
+  document.getElementById('lg-score-text').textContent = `Score: ${lgScore.correct} / ${lgScore.total}`;
+  const pct = lgScore.total > 0 ? (lgScore.correct / lgScore.total * 100) : 0;
+  document.getElementById('lg-score-bar').style.width = pct + '%';
+}
+
+function generateLagrangianQuiz() {
+  lgScore = { correct: 0, total: 0 };
+  updateLgScore();
+
+  // Generate a random Cobb-Douglas problem
+  const problems = [
+    { A: 1, a: 0.5, b: 0.5, p1: 10, p2: 15, M: 120, type: 'min',
+      context: 'A firm has production function \\(f(K,L) = K^{0.5}L^{0.5}\\). The rental rate of capital is 10 and the wage rate is 15. The firm must produce 120 units and wants to minimise costs.' },
+    { A: 1, a: 0.5, b: 0.5, p1: 2, p2: 3, M: 100, type: 'max',
+      context: 'A consumer has utility function \\(U(x_1, x_2) = x_1^{0.5} x_2^{0.5}\\). The price of good 1 is 2 and the price of good 2 is 3. Their budget is 100.' },
+    { A: 1, a: 0.25, b: 0.75, p1: 40, p2: 10, M: 100, type: 'min',
+      context: 'A firm has production function \\(f(K,L) = K^{0.25}L^{0.75}\\). The wage rate is 40 and the rental rate of capital is 10. The firm must produce 100 units.' },
+    { A: 2, a: 0.5, b: 0.5, p1: 4, p2: 6, M: 200, type: 'max',
+      context: 'Maximise \\(U(x_1, x_2) = 2x_1^{0.5} x_2^{0.5}\\) subject to \\(4x_1 + 6x_2 = 200\\).' },
+  ];
+
+  const prob = problems[Math.floor(Math.random() * problems.length)];
+
+  // Compute answers
+  const xStar = round((prob.M * prob.a) / (prob.p1 * (prob.a + prob.b)), 2);
+  const yStar = round((prob.M * prob.b) / (prob.p2 * (prob.a + prob.b)), 2);
+
+  const container = document.getElementById('lg-quiz-container');
+  lgScore.total = 4;
+
+  const questions = [
+    { q: `In the Lagrangian, what is the correct expression for the first FOC (\\(\\partial \\mathcal{L}/\\partial x = 0\\))?<br><br>What coefficient multiplies \\(\\lambda\\) in this equation?`,
+      ans: String(prob.p1), type: 'input', expl: `The FOC w.r.t. x gives: \\(${fmtNum(prob.A * prob.a)} x^{${fmtNum(prob.a - 1)}} y^{${fmtNum(prob.b)}} - ${prob.p1}\\lambda = 0\\). So the coefficient is ${prob.p1}.` },
+    { q: `When you set the two FOC expressions for \\(\\lambda\\) equal, what is the relationship between x and y?<br><br>Specifically, \\(x = k \\cdot y\\). What is \\(k\\) (to 2 d.p.)?`,
+      ans: String(round((prob.a * prob.p2) / (prob.b * prob.p1), 2)), type: 'input', expl: `\\(k = \\frac{a \\cdot p_2}{b \\cdot p_1} = \\frac{${fmtNum(prob.a)} \\times ${fmtNum(prob.p2)}}{${fmtNum(prob.b)} \\times ${fmtNum(prob.p1)}} = ${fmtNum((prob.a * prob.p2) / (prob.b * prob.p1))}\\)` },
+    { q: `What is the optimal value of \\(x^*\\) (to 2 d.p.)?`,
+      ans: String(xStar), type: 'input', expl: `\\(x^* = \\frac{M \\cdot a}{p_1(a+b)} = \\frac{${fmtNum(prob.M)} \\times ${fmtNum(prob.a)}}{${fmtNum(prob.p1)} \\times ${fmtNum(prob.a + prob.b)}} = ${fmtNum(xStar)}\\)` },
+    { q: `What is the optimal value of \\(y^*\\) (to 2 d.p.)?`,
+      ans: String(yStar), type: 'input', expl: `\\(y^* = \\frac{M \\cdot b}{p_2(a+b)} = \\frac{${fmtNum(prob.M)} \\times ${fmtNum(prob.b)}}{${fmtNum(prob.p2)} \\times ${fmtNum(prob.a + prob.b)}} = ${fmtNum(yStar)}\\)` },
+  ];
+
+  let html = `<div class="quiz-question"><div class="q-text">${prob.context}</div></div>`;
+
+  questions.forEach((item, qi) => {
+    html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+      <div class="quiz-input-row">
+        <input type="text" id="lg-input-${qi}" placeholder="Your answer">
+        <button class="btn btn-primary" onclick="checkLgInput(${qi}, '${item.ans}', '${item.expl.replace(/'/g, "\\'")}')">Check</button>
+      </div>
+      <div class="quiz-feedback" id="lg-fb-${qi}"></div></div>`;
+  });
+
+  container.innerHTML = html;
+  retypeset(container);
+}
+
+function checkLgInput(qi, correct, expl) {
+  const input = document.getElementById(`lg-input-${qi}`);
+  const fb = document.getElementById(`lg-fb-${qi}`);
+  const val = input.value.trim();
+  input.disabled = true;
+
+  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
+    lgScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.innerHTML = 'Correct! ' + expl;
+  } else {
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerHTML = `Incorrect. The answer is ${correct}. ` + expl;
+  }
+  updateLgScore();
+  retypeset(fb);
+}
+
+// ================================================================
+// TAB 4: 3D STATIONARY POINTS
+// ================================================================
+function solveStationaryPoints() {
+  hideError('sp-error');
+  const funcStr = document.getElementById('sp-func').value.trim();
+  if (!funcStr) { showError('sp-error', 'Please enter a function.'); return; }
+
+  try {
+    // Use Nerdamer for symbolic differentiation
+    const fx = nerdamer.diff(funcStr, 'x').toString();
+    const fy = nerdamer.diff(funcStr, 'y').toString();
+    const fxx = nerdamer.diff(fx, 'x').toString();
+    const fyy = nerdamer.diff(fy, 'y').toString();
+    const fxy = nerdamer.diff(fx, 'y').toString();
+
+    // Try to solve the system fx = 0, fy = 0
+    let solutions = [];
+    try {
+      const solX = nerdamer.solveEquations([fx + '=0', fy + '=0'], ['x', 'y']);
+      if (solX && solX.length > 0) {
+        if (Array.isArray(solX[0])) {
+          // Multiple solutions format: [[x, val], [y, val]]
+          // nerdamer returns pairs, need to parse
+          for (let i = 0; i < solX.length; i++) {
+            if (Array.isArray(solX[i]) && solX[i].length === 2) {
+              // Format: [['x', val], ['y', val]]
+              if (solX[i][0] === 'x' || solX[i][0] === 'y') {
+                // This is a paired solution
+                if (i + 1 < solX.length) {
+                  const xVal = solX[i][0] === 'x' ? parseFloat(nerdamer(solX[i][1]).evaluate().text()) : parseFloat(nerdamer(solX[i + 1][1]).evaluate().text());
+                  const yVal = solX[i][0] === 'y' ? parseFloat(nerdamer(solX[i][1]).evaluate().text()) : parseFloat(nerdamer(solX[i + 1][1]).evaluate().text());
+                  if (isFinite(xVal) && isFinite(yVal)) {
+                    solutions.push({ x: xVal, y: yVal });
+                  }
+                  i++; // skip paired entry
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // Fallback: try numerical approach for common function types
+      solutions = numericalSolve2D(fx, fy, -10, 10, -10, 10);
+    }
+
+    // If no solutions found, try numerical
+    if (solutions.length === 0) {
+      solutions = numericalSolve2D(fx, fy, -10, 10, -10, 10);
+    }
+
+    // Classify each stationary point
+    let classificationHtml = '';
+    if (solutions.length > 0) {
+      solutions.forEach((sol, i) => {
+        const fxxVal = safeEval(fxx.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
+        const fyyVal = safeEval(fyy.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
+        const fxyVal = safeEval(fxy.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
+
+        // Use math.js for evaluation
+        let fxxV, fyyV, fxyV, fVal;
+        try {
+          fxxV = math.evaluate(fxx, { x: sol.x, y: sol.y });
+          fyyV = math.evaluate(fyy, { x: sol.x, y: sol.y });
+          fxyV = math.evaluate(fxy, { x: sol.x, y: sol.y });
+          fVal = math.evaluate(funcStr, { x: sol.x, y: sol.y });
+        } catch {
+          fxxV = fxxVal; fyyV = fyyVal; fxyV = fxyVal; fVal = NaN;
+        }
+
+        const H = fxxV * fyyV - fxyV * fxyV;
+        let nature = '';
+        if (H > 1e-8 && fxxV < -1e-8) nature = 'Local Maximum';
+        else if (H > 1e-8 && fxxV > 1e-8) nature = 'Local Minimum';
+        else if (H < -1e-8) nature = 'Saddle Point';
+        else nature = 'Inconclusive (H = 0)';
+
+        classificationHtml += `
+          <div class="step">
+            <div class="step-label">Point ${i + 1}: \\((${fmtNum(sol.x)}, ${fmtNum(sol.y)})\\)</div>
+            \\(f(${fmtNum(sol.x)}, ${fmtNum(sol.y)}) = ${fmtNum(fVal)}\\)<br><br>
+            \\(f_{xx} = ${fmtNum(fxxV)}\\), \\(f_{yy} = ${fmtNum(fyyV)}\\), \\(f_{xy} = ${fmtNum(fxyV)}\\)<br><br>
+            \\(H = f_{xx} \\cdot f_{yy} - (f_{xy})^2 = ${fmtNum(fxxV)} \\times ${fmtNum(fyyV)} - (${fmtNum(fxyV)})^2 = ${fmtNum(H)}\\)<br><br>
+            <strong>Classification: ${nature}</strong>
+          </div>`;
+      });
+    } else {
+      classificationHtml = '<div class="step">No stationary points found. Try a different function or check the input.</div>';
+    }
+
+    const out = document.getElementById('sp-solution');
+    out.classList.add('visible');
+    out.innerHTML = `
+      <div class="step">
+        <div class="step-label">Step 1: Partial Derivatives</div>
+        \\[f_x = ${fx}\\]
+        \\[f_y = ${fy}\\]
+      </div>
+      <div class="step">
+        <div class="step-label">Step 2: Second Partial Derivatives</div>
+        \\[f_{xx} = ${fxx}\\]
+        \\[f_{yy} = ${fyy}\\]
+        \\[f_{xy} = ${fxy}\\]
+      </div>
+      <div class="step">
+        <div class="step-label">Step 3: Solve \\(f_x = 0\\) and \\(f_y = 0\\)</div>
+        Setting both partial derivatives to zero and solving simultaneously:
+      </div>
+      ${classificationHtml}`;
+
+    retypeset(out);
+
+  } catch (e) {
+    showError('sp-error', 'Error: Could not process the function. Make sure to use * for multiplication (e.g., 3*x*y, not 3xy). Error: ' + e.message);
+  }
+}
+
+function numericalSolve2D(fxStr, fyStr, xMin, xMax, yMin, yMax) {
+  const solutions = [];
+  const gridSize = 20;
+  const stepX = (xMax - xMin) / gridSize;
+  const stepY = (yMax - yMin) / gridSize;
+
+  for (let i = 0; i <= gridSize; i++) {
+    for (let j = 0; j <= gridSize; j++) {
+      let xg = xMin + i * stepX;
+      let yg = yMin + j * stepY;
+
+      // Newton's method
+      for (let iter = 0; iter < 30; iter++) {
+        let vx, vy;
+        try {
+          vx = math.evaluate(fxStr, { x: xg, y: yg });
+          vy = math.evaluate(fyStr, { x: xg, y: yg });
+        } catch { break; }
+
+        if (!isFinite(vx) || !isFinite(vy)) break;
+        if (Math.abs(vx) < 1e-10 && Math.abs(vy) < 1e-10) {
+          // Found a solution - check it's not a duplicate
+          const isDup = solutions.some(s => Math.abs(s.x - xg) < 0.01 && Math.abs(s.y - yg) < 0.01);
+          if (!isDup && isFinite(xg) && isFinite(yg)) {
+            solutions.push({ x: round(xg, 4), y: round(yg, 4) });
+          }
+          break;
+        }
+
+        // Numerical Jacobian
+        const h = 1e-7;
+        let fxx_n, fxy_n, fyx_n, fyy_n;
+        try {
+          fxx_n = (math.evaluate(fxStr, { x: xg + h, y: yg }) - vx) / h;
+          fxy_n = (math.evaluate(fxStr, { x: xg, y: yg + h }) - vx) / h;
+          fyx_n = (math.evaluate(fyStr, { x: xg + h, y: yg }) - vy) / h;
+          fyy_n = (math.evaluate(fyStr, { x: xg, y: yg + h }) - vy) / h;
+        } catch { break; }
+
+        const det = fxx_n * fyy_n - fxy_n * fyx_n;
+        if (Math.abs(det) < 1e-15) break;
+
+        xg -= (fyy_n * vx - fxy_n * vy) / det;
+        yg -= (-fyx_n * vx + fxx_n * vy) / det;
+
+        if (!isFinite(xg) || !isFinite(yg) || Math.abs(xg) > 1e6 || Math.abs(yg) > 1e6) break;
+      }
+    }
+  }
+  return solutions;
+}
+
+function clearStationary() {
+  document.getElementById('sp-solution').innerHTML = '';
+  document.getElementById('sp-solution').classList.remove('visible');
+  hideError('sp-error');
+}
+
+// Stationary Points Quiz
+let spScore = { correct: 0, total: 0 };
+
+function updateSpScore() {
+  document.getElementById('sp-score-text').textContent = `Score: ${spScore.correct} / ${spScore.total}`;
+  const pct = spScore.total > 0 ? (spScore.correct / spScore.total * 100) : 0;
+  document.getElementById('sp-score-bar').style.width = pct + '%';
+}
+
+function generateStationaryQuiz() {
+  spScore = { correct: 0, total: 0 };
+  updateSpScore();
+
+  const problems = [
+    { func: 'x^2 + y^2 - 4*x - 6*y + 13', display: 'f(x,y) = x^2 + y^2 - 4x - 6y + 13',
+      fx: '2x - 4', fy: '2y - 6', sp: {x: 2, y: 3}, fxx: 2, fyy: 2, fxy: 0, H: 4, nature: 'Minimum' },
+    { func: '-x^2 - y^2 + 2*x + 4*y', display: 'f(x,y) = -x^2 - y^2 + 2x + 4y',
+      fx: '-2x + 2', fy: '-2y + 4', sp: {x: 1, y: 2}, fxx: -2, fyy: -2, fxy: 0, H: 4, nature: 'Maximum' },
+    { func: 'x^2 - y^2', display: 'f(x,y) = x^2 - y^2',
+      fx: '2x', fy: '-2y', sp: {x: 0, y: 0}, fxx: 2, fyy: -2, fxy: 0, H: -4, nature: 'Saddle Point' },
+    { func: 'x^2 + x*y + y^2 - 3*x', display: 'f(x,y) = x^2 + xy + y^2 - 3x',
+      fx: '2x + y - 3', fy: 'x + 2y', sp: {x: 2, y: -1}, fxx: 2, fyy: 2, fxy: 1, H: 3, nature: 'Minimum' },
+  ];
+
+  const prob = problems[Math.floor(Math.random() * problems.length)];
+  const container = document.getElementById('sp-quiz-container');
+  spScore.total = 5;
+
+  let html = `<div class="quiz-question"><div class="q-text">Find and classify the stationary point(s) of \\(${prob.display}\\).</div></div>`;
+
+  const questions = [
+    { q: `What is \\(f_x\\)?`, opts: [prob.fx, prob.fy, '0', `${prob.fxx}x`], ans: 0, type: 'mc' },
+    { q: `At the stationary point, what is the value of \\(x\\)?`, ans: String(prob.sp.x), type: 'input' },
+    { q: `At the stationary point, what is the value of \\(y\\)?`, ans: String(prob.sp.y), type: 'input' },
+    { q: `What is the value of the Hessian \\(H = f_{xx}f_{yy} - (f_{xy})^2\\)?`, ans: String(prob.H), type: 'input' },
+    { q: `What is the nature of this stationary point?`, opts: ['Minimum', 'Maximum', 'Saddle Point', 'Inconclusive'], ans: ['Minimum','Maximum','Saddle Point','Inconclusive'].indexOf(prob.nature), type: 'mc' },
+  ];
+
+  questions.forEach((item, qi) => {
+    if (item.type === 'mc') {
+      // Shuffle options for non-answer questions
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-options" id="sp-opts-${qi}">
+          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkSpMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
+        </div>
+        <div class="quiz-feedback" id="sp-fb-${qi}"></div></div>`;
+    } else {
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-input-row">
+          <input type="text" id="sp-input-${qi}" placeholder="Your answer">
+          <button class="btn btn-primary" onclick="checkSpInput(${qi}, '${item.ans}')">Check</button>
+        </div>
+        <div class="quiz-feedback" id="sp-fb-${qi}"></div></div>`;
+    }
+  });
+
+  container.innerHTML = html;
+  retypeset(container);
+}
+
+function checkSpMc(el, qi, chosen, correct) {
+  const opts = document.querySelectorAll(`#sp-opts-${qi} .quiz-option`);
+  opts.forEach(o => o.classList.add('disabled'));
+  const fb = document.getElementById(`sp-fb-${qi}`);
+  if (chosen === correct) {
+    el.classList.add('correct');
+    spScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Correct!';
+  } else {
+    el.classList.add('incorrect');
+    opts[correct].classList.add('correct');
+    fb.className = 'quiz-feedback incorrect';
+    fb.textContent = 'Incorrect.';
+  }
+  updateSpScore();
+}
+
+function checkSpInput(qi, correct) {
+  const input = document.getElementById(`sp-input-${qi}`);
+  const fb = document.getElementById(`sp-fb-${qi}`);
+  const val = input.value.trim();
+  input.disabled = true;
+  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
+    spScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Correct!';
+  } else {
+    fb.className = 'quiz-feedback incorrect';
+    fb.textContent = `Incorrect. The answer is ${correct}.`;
+  }
+  updateSpScore();
+}
+
+// ================================================================
+// TAB 5: HOMOGENEITY
+// ================================================================
+function solveHomogeneity() {
+  hideError('hg-error');
+  const A = parseFloat(document.getElementById('hg-A').value);
+  const a = parseFloat(document.getElementById('hg-a').value);
+  const b = parseFloat(document.getElementById('hg-b').value);
+
+  if ([A, a, b].some(isNaN)) {
+    showError('hg-error', 'Please fill in all fields with valid numbers.');
+    return;
+  }
+
+  const degree = a + b;
+  const Astr = A === 1 ? '' : fmtNum(A);
+  const funcDisplay = `${Astr}x^{${fmtNum(a)}} y^{${fmtNum(b)}}`;
+
+  // Partial derivatives
+  // f_x = A * a * x^(a-1) * y^b
+  // f_y = A * b * x^a * y^(b-1)
+  const fxCoeff = A * a;
+  const fyCoeff = A * b;
+
+  // Euler's check: x*f_x + y*f_y should equal n*f
+  // x * A*a*x^(a-1)*y^b + y * A*b*x^a*y^(b-1)
+  // = A*a*x^a*y^b + A*b*x^a*y^b
+  // = A(a+b)*x^a*y^b
+  // = (a+b) * f(x,y)
+
+  let rts = '';
+  if (degree > 1) rts = 'Increasing returns to scale. Doubling inputs more than doubles output.';
+  else if (degree === 1) rts = 'Constant returns to scale. Doubling inputs exactly doubles output.';
+  else rts = 'Decreasing returns to scale. Doubling inputs less than doubles output.';
+
+  const out = document.getElementById('hg-solution');
+  out.classList.add('visible');
+  out.innerHTML = `
+    <div class="step">
+      <div class="step-label">Function</div>
+      \\[f(x,y) = ${funcDisplay}\\]
+    </div>
+
+    <div class="step">
+      <div class="step-label">Method 1: Euler's Theorem</div>
+      <p>Euler's theorem states: if \\(f\\) is homogeneous of degree \\(n\\), then \\(x\\,f_x + y\\,f_y = n\\,f(x,y)\\).</p><br>
+      <strong>Partial derivatives:</strong><br>
+      \\[f_x = ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a - 1)}}\\, y^{${fmtNum(b)}}\\]
+      \\[f_y = ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b - 1)}}\\]
+      <br><strong>Euler's check:</strong><br>
+      \\[x \\cdot f_x + y \\cdot f_y = x \\cdot ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a - 1)}}\\, y^{${fmtNum(b)}} + y \\cdot ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b - 1)}}\\]
+      \\[= ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}} + ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
+      \\[= (${fmtNum(fxCoeff)} + ${fmtNum(fyCoeff)})\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
+      \\[= ${fmtNum(a + b)} \\cdot ${Astr || ''}x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}} = ${fmtNum(degree)} \\cdot f(x,y)\\]
+      <br>This confirms the function is <strong>homogeneous of degree ${fmtNum(degree)}</strong>.
+    </div>
+
+    <div class="step">
+      <div class="step-label">Method 2: Scaling Method</div>
+      <p>Replace \\(x\\) with \\(tx\\) and \\(y\\) with \\(ty\\):</p><br>
+      \\[f(tx, ty) = ${Astr}(tx)^{${fmtNum(a)}}(ty)^{${fmtNum(b)}}\\]
+      \\[= ${Astr}\\, t^{${fmtNum(a)}}\\, x^{${fmtNum(a)}} \\cdot t^{${fmtNum(b)}}\\, y^{${fmtNum(b)}}\\]
+      \\[= t^{${fmtNum(a)} + ${fmtNum(b)}} \\cdot ${Astr}x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
+      \\[= t^{${fmtNum(degree)}} \\cdot f(x,y)\\]
+      <br>Since \\(f(tx, ty) = t^{${fmtNum(degree)}} f(x,y)\\), the function is <strong>homogeneous of degree ${fmtNum(degree)}</strong>.
+    </div>
+
+    <div class="step">
+      <div class="step-label">Returns to Scale</div>
+      The degree of homogeneity is \\(n = ${fmtNum(degree)}\\).<br><br>
+      <strong>${rts}</strong>
+    </div>`;
+
+  retypeset(out);
+}
+
+function clearHomogeneity() {
+  document.getElementById('hg-solution').innerHTML = '';
+  document.getElementById('hg-solution').classList.remove('visible');
+  hideError('hg-error');
+}
+
+// Homogeneity Quiz
+let hgScore = { correct: 0, total: 0 };
+
+function updateHgScore() {
+  document.getElementById('hg-score-text').textContent = `Score: ${hgScore.correct} / ${hgScore.total}`;
+  const pct = hgScore.total > 0 ? (hgScore.correct / hgScore.total * 100) : 0;
+  document.getElementById('hg-score-bar').style.width = pct + '%';
+}
+
+function generateHomogeneityQuiz() {
+  hgScore = { correct: 0, total: 0 };
+  updateHgScore();
+
+  // Generate random Cobb-Douglas
+  const coeffs = [
+    { A: 1, a: 0.5, b: 0.5 },
+    { A: 1, a: 0.75, b: 0.75 },
+    { A: 2, a: 0.3, b: 0.7 },
+    { A: 1, a: 0.25, b: 0.75 },
+    { A: 3, a: 0.5, b: 1 },
+    { A: 1, a: 0.6, b: 0.4 },
+    { A: 5, a: 0.8, b: 0.4 },
+  ];
+
+  const c = coeffs[Math.floor(Math.random() * coeffs.length)];
+  const degree = c.a + c.b;
+  const Astr = c.A === 1 ? '' : c.A;
+  const funcDisplay = `f(x,y) = ${Astr}x^{${fmtNum(c.a)}} y^{${fmtNum(c.b)}}`;
+
+  let rtsAnswer;
+  if (degree > 1) rtsAnswer = 'Increasing';
+  else if (degree === 1) rtsAnswer = 'Constant';
+  else rtsAnswer = 'Decreasing';
+
+  const container = document.getElementById('hg-quiz-container');
+  hgScore.total = 4;
+
+  let html = `<div class="quiz-question"><div class="q-text">Consider the function \\(${funcDisplay}\\)</div></div>`;
+
+  const questions = [
+    { q: `What is \\(f_x\\)? What is the coefficient (the number multiplying the rest)?`,
+      ans: String(round(c.A * c.a, 4)), type: 'input',
+      expl: `\\(f_x = ${fmtNum(c.A * c.a)} x^{${fmtNum(c.a - 1)}} y^{${fmtNum(c.b)}}\\), so the coefficient is ${fmtNum(c.A * c.a)}.` },
+    { q: `When you compute \\(x \\cdot f_x + y \\cdot f_y\\), what multiple of \\(f(x,y)\\) do you get? (i.e., what is the degree of homogeneity?)`,
+      ans: String(round(degree, 4)), type: 'input',
+      expl: `The degree is \\(a + b = ${fmtNum(c.a)} + ${fmtNum(c.b)} = ${fmtNum(degree)}\\).` },
+    { q: `If the firm doubles its inputs, by what factor does output change?`,
+      ans: String(round(Math.pow(2, degree), 4)), type: 'input',
+      expl: `With degree \\(n = ${fmtNum(degree)}\\), doubling inputs multiplies output by \\(2^{${fmtNum(degree)}} = ${fmtNum(Math.pow(2, degree))}\\).` },
+    { q: `What type of returns to scale does this function exhibit?`,
+      opts: ['Increasing', 'Constant', 'Decreasing'], ans: ['Increasing','Constant','Decreasing'].indexOf(rtsAnswer), type: 'mc' },
+  ];
+
+  questions.forEach((item, qi) => {
+    if (item.type === 'mc') {
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-options" id="hg-opts-${qi}">
+          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkHgMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
+        </div>
+        <div class="quiz-feedback" id="hg-fb-${qi}"></div></div>`;
+    } else {
+      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
+        <div class="quiz-input-row">
+          <input type="text" id="hg-input-${qi}" placeholder="Your answer">
+          <button class="btn btn-primary" onclick="checkHgInput(${qi}, '${item.ans}', \`${item.expl}\`)">Check</button>
+        </div>
+        <div class="quiz-feedback" id="hg-fb-${qi}"></div></div>`;
+    }
+  });
+
+  container.innerHTML = html;
+  retypeset(container);
+}
+
+function checkHgMc(el, qi, chosen, correct) {
+  const opts = document.querySelectorAll(`#hg-opts-${qi} .quiz-option`);
+  opts.forEach(o => o.classList.add('disabled'));
+  const fb = document.getElementById(`hg-fb-${qi}`);
+  if (chosen === correct) {
+    el.classList.add('correct');
+    hgScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Correct!';
+  } else {
+    el.classList.add('incorrect');
+    opts[correct].classList.add('correct');
+    fb.className = 'quiz-feedback incorrect';
+    fb.textContent = 'Incorrect.';
+  }
+  updateHgScore();
+}
+
+function checkHgInput(qi, correct, expl) {
+  const input = document.getElementById(`hg-input-${qi}`);
+  const fb = document.getElementById(`hg-fb-${qi}`);
+  const val = input.value.trim();
+  input.disabled = true;
+  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
+    hgScore.correct++;
+    fb.className = 'quiz-feedback correct';
+    fb.innerHTML = 'Correct! ' + expl;
+  } else {
+    fb.className = 'quiz-feedback incorrect';
+    fb.innerHTML = `Incorrect. The answer is ${correct}. ` + expl;
+  }
+  updateHgScore();
+  retypeset(fb);
+}
+
+// ================================================================
+// INITIALISE
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Generate initial quizzes
+  generateKeyFactsQuiz();
+
+  // Enter key triggers solve/plot in input fields
+  document.getElementById('graph-func').addEventListener('keydown', e => { if (e.key === 'Enter') drawGraph(); });
+  document.getElementById('sp-func').addEventListener('keydown', e => { if (e.key === 'Enter') solveStationaryPoints(); });
+});
+</script>
+</body>
+</html>
