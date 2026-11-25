@@ -3,2084 +3,1334 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QM Study Tool - Quantitative Methods</title>
-
-<!-- MathJax for equation rendering -->
+<meta name="theme-color" content="#1a2b4a">
+<title>QM Maths Practice</title>
+<!--
+  QM Maths Practice -- Dr Jack Britton, University of York
+  ---------------------------------------------------------
+  * One self-contained page. The only outside file is MathJax (pinned to version 3.2.2).
+  * To ADD OR EDIT SKILL QUESTIONS: scroll to the block <script type="text/plain" id="skill-bank">.
+    The format is explained at the top of that block. No programming needed.
+  * The exam questions (problems A-D) are generated from the "EXAM VARIANTS" data further down.
+  * Progress is saved on each student's own phone only (nothing is sent anywhere).
+-->
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
-  startup: { typeset: true }
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  options: { enableMenu: false },
+  startup: { typeset: false }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-
-<!-- Plotly for graphing -->
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-<!-- math.js for function evaluation -->
-<script src="https://cdn.jsdelivr.net/npm/mathjs@12.2.1/lib/browser/math.js"></script>
-
-<!-- Nerdamer for symbolic math -->
-<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/nerdamer.core.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Algebra.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Calculus.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/Solve.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
 <style>
-/* ========== RESET & BASE ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #f0f4f8;
-  color: #1a202c;
-  line-height: 1.6;
-  min-height: 100vh;
-}
-
-/* ========== HEADER ========== */
-header {
-  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-  color: white;
-  padding: 1.5rem 2rem 0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-header h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-header p {
-  font-size: 0.85rem;
-  opacity: 0.8;
-  margin-top: 0.15rem;
-}
-
-/* ========== TABS ========== */
-nav {
-  display: flex;
-  gap: 0.25rem;
-  margin-top: 1rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-nav button {
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.75);
-  border: none;
-  padding: 0.65rem 1.2rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 8px 8px 0 0;
-  transition: all 0.2s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-nav button:hover {
-  background: rgba(255,255,255,0.15);
-  color: white;
-}
-
-nav button.active {
-  background: #f0f4f8;
-  color: #1a365d;
-  font-weight: 600;
-}
-
-/* ========== MAIN CONTENT ========== */
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* ========== CARDS ========== */
-.card {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  border: 1px solid #e2e8f0;
-}
-
-.card h2 {
-  font-size: 1.25rem;
-  color: #1a365d;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.card h3 {
-  font-size: 1.05rem;
-  color: #2d3748;
-  margin: 1rem 0 0.5rem;
-}
-
-/* ========== RULE CARDS ========== */
-.rules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.rule-card {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1rem;
-  border-left: 4px solid #3182ce;
-}
-
-.rule-card h4 {
-  font-size: 0.9rem;
-  color: #2c5282;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.rule-card .rule-item {
-  padding: 0.35rem 0;
-  font-size: 1rem;
-}
-
-/* ========== FORMS & INPUTS ========== */
-.input-group {
-  margin-bottom: 1rem;
-}
-
-.input-group label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #4a5568;
-  margin-bottom: 0.35rem;
-}
-
-.input-group input, .input-group select {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-family: 'Consolas', 'Courier New', monospace;
-  transition: border-color 0.2s;
-}
-
-.input-group input:focus, .input-group select:focus {
-  outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.75rem;
-}
-
-.hint {
-  font-size: 0.8rem;
-  color: #718096;
-  margin-top: 0.25rem;
-}
-
-.hint a {
-  color: #3182ce;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.hint a:hover {
-  text-decoration: underline;
-}
-
-/* ========== BUTTONS ========== */
-.btn {
-  padding: 0.6rem 1.4rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary {
-  background: #3182ce;
-  color: white;
-}
-
-.btn-primary:hover { background: #2c5282; }
-
-.btn-secondary {
-  background: #edf2f7;
-  color: #4a5568;
-}
-
-.btn-secondary:hover { background: #e2e8f0; }
-
-.btn-success {
-  background: #38a169;
-  color: white;
-}
-
-.btn-success:hover { background: #2f855a; }
-
-.btn-warning {
-  background: #dd6b20;
-  color: white;
-}
-
-.btn-warning:hover { background: #c05621; }
-
-.btn-group {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-/* ========== SOLUTION OUTPUT ========== */
-.solution-output {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-top: 1rem;
-  display: none;
-}
-
-.solution-output.visible {
-  display: block;
-}
-
-.step {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.step:last-child { border-bottom: none; }
-
-.step-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #3182ce;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.3rem;
-}
-
-/* ========== QUIZ ========== */
-.quiz-container {
-  margin-top: 1rem;
-}
-
-.quiz-question {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.quiz-question .q-text {
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  font-size: 1rem;
-}
-
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.quiz-option {
-  padding: 0.6rem 0.8rem;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: white;
-  font-size: 0.95rem;
-}
-
-.quiz-option:hover {
-  border-color: #3182ce;
-  background: #ebf8ff;
-}
-
-.quiz-option.correct {
-  border-color: #38a169;
-  background: #f0fff4;
-  color: #22543d;
-}
-
-.quiz-option.incorrect {
-  border-color: #e53e3e;
-  background: #fff5f5;
-  color: #742a2a;
-}
-
-.quiz-option.disabled {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-.quiz-feedback {
-  margin-top: 0.6rem;
-  padding: 0.6rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  display: none;
-}
-
-.quiz-feedback.correct {
-  display: block;
-  background: #f0fff4;
-  color: #22543d;
-  border: 1px solid #c6f6d5;
-}
-
-.quiz-feedback.incorrect {
-  display: block;
-  background: #fff5f5;
-  color: #742a2a;
-  border: 1px solid #fed7d7;
-}
-
-.quiz-input-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.quiz-input-row input {
-  padding: 0.5rem 0.7rem;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 6px;
-  font-family: 'Consolas', monospace;
-  font-size: 0.95rem;
-  width: 200px;
-}
-
-.score-bar {
-  background: #edf2f7;
-  border-radius: 20px;
-  height: 10px;
-  overflow: hidden;
-  margin: 0.75rem 0;
-}
-
-.score-bar-fill {
-  background: linear-gradient(90deg, #3182ce, #38a169);
-  height: 100%;
-  border-radius: 20px;
-  transition: width 0.5s ease;
-}
-
-.score-text {
-  text-align: center;
-  font-weight: 600;
-  color: #4a5568;
-  font-size: 0.9rem;
-}
-
-/* ========== TOGGLE SECTIONS ========== */
-.section-toggle {
-  display: flex;
-  gap: 0.25rem;
-  margin-bottom: 1.25rem;
-  background: #edf2f7;
-  border-radius: 8px;
-  padding: 0.25rem;
-}
-
-.section-toggle button {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  background: transparent;
-  color: #4a5568;
-  transition: all 0.2s;
-}
-
-.section-toggle button.active {
-  background: white;
-  color: #1a365d;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.sub-section {
-  display: none;
-}
-
-.sub-section.active {
-  display: block;
-}
-
-/* ========== PLOTLY GRAPH ========== */
-.graph-container {
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 1rem 0;
-}
-
-/* ========== ERROR MESSAGES ========== */
-.error-msg {
-  background: #fff5f5;
-  color: #c53030;
-  border: 1px solid #feb2b2;
-  padding: 0.6rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  display: none;
-}
-
-.error-msg.visible {
-  display: block;
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 640px) {
-  header { padding: 1rem 1rem 0; }
-  header h1 { font-size: 1.3rem; }
-  main { padding: 1rem; }
-  nav button { padding: 0.5rem 0.8rem; font-size: 0.78rem; }
-  .card { padding: 1rem; }
-  .rules-grid { grid-template-columns: 1fr; }
-  .input-row { grid-template-columns: 1fr; }
-}
-
-/* ========== MISC ========== */
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.text-muted { color: #718096; font-size: 0.85rem; }
-.text-center { text-align: center; }
-.hidden { display: none; }
-
-table.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0.75rem 0;
-  font-size: 0.9rem;
-}
-
-table.data-table th, table.data-table td {
-  border: 1px solid #e2e8f0;
-  padding: 0.5rem 0.75rem;
-  text-align: center;
-}
-
-table.data-table th {
-  background: #edf2f7;
-  font-weight: 600;
-  color: #2d3748;
-}
+:root {
+  --navy: #1a2b4a; --teal: #13807a; --teal-l: #e6f4f2; --orange: #d9662b; --orange-l: #fdf0e8;
+  --grey: #f3f5f8; --line: #dfe4ea; --text: #1d2433; --mid: #5b6576;
+  --good: #1f8a4c; --good-l: #e7f6ed; --bad: #c0392b; --bad-l: #fbeceb;
+}
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--grey);
+  color: var(--text); line-height: 1.5; font-size: 17px; }
+header { position: sticky; top: 0; z-index: 10; background: var(--navy); color: #fff;
+  display: flex; align-items: center; gap: .5rem; padding: .7rem .9rem; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+header .title { font-weight: 700; font-size: 1.05rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+header button { background: rgba(255,255,255,.12); color: #fff; border: 0; border-radius: 8px;
+  padding: .45rem .7rem; font-size: .95rem; cursor: pointer; }
+header button.hidden { visibility: hidden; }
+main { max-width: 640px; margin: 0 auto; padding: 1rem .9rem 5rem; }
+h1 { font-size: 1.35rem; color: var(--navy); margin: .3rem 0 .6rem; }
+h2 { font-size: 1.1rem; color: var(--navy); margin: 1.2rem 0 .5rem; }
+p { margin: .4rem 0; }
+.muted { color: var(--mid); font-size: .9rem; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1rem; margin: .7rem 0; }
+.tile { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--line);
+  border-radius: 12px; padding: .9rem 1rem; margin: .6rem 0; cursor: pointer; font: inherit; color: inherit; }
+.tile:active { background: var(--grey); }
+.tile .t { font-weight: 650; color: var(--navy); }
+.tile .s { color: var(--mid); font-size: .88rem; margin-top: .15rem; }
+.tile .badge { float: right; font-size: .8rem; color: var(--teal); font-weight: 600; margin-left: .5rem; }
+.letter { display: inline-block; width: 1.8rem; height: 1.8rem; border-radius: 6px; background: var(--orange);
+  color: #fff; font-weight: 700; text-align: center; line-height: 1.8rem; margin-right: .6rem; }
+.btn { display: inline-block; border: 0; border-radius: 10px; padding: .8rem 1.2rem; font: inherit; font-weight: 650;
+  cursor: pointer; background: var(--teal); color: #fff; }
+.btn.secondary { background: #e3e8ee; color: var(--text); }
+.btn.wide { width: 100%; margin-top: .8rem; }
+.row { display: flex; gap: .6rem; flex-wrap: wrap; }
+.row .btn { flex: 1; }
+.qcard { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1rem; }
+.qhead { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; color: var(--mid); margin-bottom: .5rem; }
+.part { background: var(--orange-l); color: var(--orange); font-weight: 700; border-radius: 6px; padding: .1rem .5rem; }
+.qtext { font-size: 1.02rem; margin-bottom: .8rem; }
+.opt { display: block; width: 100%; text-align: left; font: inherit; color: inherit; background: var(--grey);
+  border: 2px solid transparent; border-radius: 10px; padding: .75rem .85rem; margin: .5rem 0; cursor: pointer; overflow-x: auto; }
+.opt.correct { background: var(--good-l); border-color: var(--good); }
+.opt.wrong { background: var(--bad-l); border-color: var(--bad); }
+.opt[disabled] { cursor: default; }
+.opt svg { display: block; width: 100%; height: auto; }
+.optgrid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.optgrid .opt { margin: 0; padding: .4rem; }
+.feedback { margin-top: .7rem; border-radius: 10px; padding: .75rem .85rem; font-size: .95rem; }
+.feedback.good { background: var(--good-l); }
+.feedback.bad { background: var(--bad-l); }
+.feedback b { display: block; margin-bottom: .2rem; }
+.progress { height: 6px; background: #e3e8ee; border-radius: 3px; overflow: hidden; margin: .2rem 0 .8rem; }
+.progress div { height: 100%; background: var(--teal); }
+.facts { background: var(--teal-l); border-left: 4px solid var(--teal); border-radius: 8px; padding: .7rem .9rem; margin: .6rem 0; }
+.facts li { margin: .35rem 0 .35rem 1.1rem; }
+.exam { background: var(--orange-l); border-left: 4px solid var(--orange); border-radius: 8px; padding: .8rem .9rem; margin: .6rem 0; }
+.exam ol { margin-left: 1.3rem; }
+.exam li { margin: .3rem 0; }
+.marks { float: right; color: var(--mid); font-size: .85rem; margin-left: .4rem; }
+.big { font-size: 2.2rem; font-weight: 800; color: var(--navy); }
+.model { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem; margin-top: .8rem; overflow-x: auto; }
+.model .step { padding: .45rem 0; border-bottom: 1px solid var(--line); }
+.model .step:last-child { border-bottom: 0; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; }
+mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+mjx-container[display="true"] { margin: .4em 0 !important; }
 </style>
 </head>
 <body>
-
-<!-- ==================== HEADER ==================== -->
 <header>
-  <h1>Quantitative Methods</h1>
-  <p>University of York &mdash; Dr Jack Britton</p>
-  <nav id="main-nav">
-    <button class="active" data-tab="keyfacts">Key Facts</button>
-    <button data-tab="graphing">Graph Drawing</button>
-    <button data-tab="lagrangian">Lagrangian Solver</button>
-    <button data-tab="stationary">3D Stationary Points</button>
-    <button data-tab="homogeneity">Homogeneity</button>
-  </nav>
+  <button id="back" class="hidden" onclick="goBack()">&#8592; Back</button>
+  <div class="title" id="title">QM Maths Practice</div>
+  <button onclick="go('#/')">Home</button>
 </header>
+<main id="app"></main>
 
-<!-- ==================== MAIN CONTENT ==================== -->
-<main>
+<!-- =====================================================================================
+     SKILL QUESTION BANK  --  edit freely
+     -------------------------------------------------------------------------------------
+     ## ID | Skill name | Lecture(s) | Week          starts a new skill (the week is used for the
+                                                   mock weekly tests)
+     K: ...                                        a key fact shown on the skill's summary card
+     Q: ...                                        a question
+     + ...                                         the correct answer (exactly one per question)
+     - ...                                         a wrong answer (as many as you like; 3 is best)
+     W: ...                                        the explanation shown after answering
+     Maths goes inside \( ... \). Options are shuffled automatically. Lines starting # are ignored.
+     ===================================================================================== -->
+<script type="text/plain" id="skill-bank">
+## S1 | Indices and simultaneous equations | Lecture 1 | 1
+K: \(x^a \times x^b = x^{a+b}\), \(\quad x^a \div x^b = x^{a-b}\), \(\quad (x^a)^b = x^{ab}\)
+K: \(x^{-a} = \dfrac{1}{x^a}\), \(\quad x^{\frac{1}{n}} = \sqrt[n]{x}\), \(\quad x^0 = 1\)
+K: Simultaneous equations: rearrange one equation for one unknown and substitute it into the other.
 
-<!-- ============================================================ -->
-<!-- TAB 1: KEY FACTS                                             -->
-<!-- ============================================================ -->
-<div id="tab-keyfacts" class="tab-content active">
+Q: Simplify \(x^3 \times x^5\).
++ \(x^8\)
+- \(x^{15}\)
+- \(x^2\)
+- \(2x^8\)
+W: Add the powers: \(x^{3+5} = x^8\).
 
-  <div class="section-toggle">
-    <button class="active" data-sub="kf-reference">Reference</button>
-    <button data-sub="kf-quiz">Test Yourself</button>
-  </div>
+Q: Simplify \(\left(x^3y^{-2}\right)^2 \times xy^5\).
++ \(x^7y\)
+- \(x^6y^3\)
+- \(x^7y^9\)
+- \(x^5y\)
+W: \(\left(x^3y^{-2}\right)^2 = x^6y^{-4}\), then \(x^6y^{-4} \times xy^5 = x^7y\).
 
-  <!-- REFERENCE SUB-SECTION -->
-  <div id="kf-reference" class="sub-section active">
+Q: What is \(8^{\frac{2}{3}}\)?
++ \(4\)
+- \(\frac{16}{3}\)
+- \(6\)
+- \(2\)
+W: \(8^{\frac{2}{3}} = \left(\sqrt[3]{8}\right)^2 = 2^2 = 4\).
 
-    <!-- INDICES RULES -->
-    <div class="card">
-      <h2>Indices Rules</h2>
-      <div class="rules-grid">
-        <div class="rule-card">
-          <h4>Multiplication</h4>
-          <div class="rule-item">\( x^a \cdot x^b = x^{a+b} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Division</h4>
-          <div class="rule-item">\( \dfrac{x^a}{x^b} = x^{a-b} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Power of a Power</h4>
-          <div class="rule-item">\( (x^a)^b = x^{ab} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Zero Exponent</h4>
-          <div class="rule-item">\( x^0 = 1 \quad (x \neq 0) \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Negative Exponent</h4>
-          <div class="rule-item">\( x^{-a} = \dfrac{1}{x^a} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Fractional Exponent</h4>
-          <div class="rule-item">\( x^{a/b} = \sqrt[b]{x^a} = \left(\sqrt[b]{x}\right)^a \)</div>
-        </div>
-      </div>
-    </div>
+Q: What is \(x^{-\frac{1}{2}}\)?
++ \(\dfrac{1}{\sqrt{x}}\)
+- \(-\sqrt{x}\)
+- \(\dfrac{x}{2}\)
+- \(-\dfrac{1}{2x}\)
+W: A negative power means "one over", and a power of \(\frac{1}{2}\) is a square root.
 
-    <!-- LOG & EXP RULES -->
-    <div class="card">
-      <h2>Log &amp; Exponential Facts</h2>
-      <div class="rules-grid">
-        <div class="rule-card">
-          <h4>Product Rule</h4>
-          <div class="rule-item">\( \ln(ab) = \ln a + \ln b \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Quotient Rule</h4>
-          <div class="rule-item">\( \ln\!\left(\dfrac{a}{b}\right) = \ln a - \ln b \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Power Rule</h4>
-          <div class="rule-item">\( \ln(a^n) = n \ln a \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Key Values</h4>
-          <div class="rule-item">\( \ln e = 1, \quad \ln 1 = 0 \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Inverse Relationships</h4>
-          <div class="rule-item">\( e^{\ln x} = x, \quad \ln(e^x) = x \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Exponential Growth</h4>
-          <div class="rule-item">\( e^{a+b} = e^a \cdot e^b, \quad e^{-a} = \dfrac{1}{e^a} \)</div>
-        </div>
-      </div>
-    </div>
+Q: Simplify \(\dfrac{K^{\frac{1}{3}}L^{\frac{2}{3}}}{K^{-\frac{2}{3}}L^{\frac{2}{3}}}\).
++ \(K\)
+- \(K^{-\frac{1}{3}}\)
+- \(KL^{\frac{4}{3}}\)
+- \(1\)
+W: \(K^{\frac{1}{3} - (-\frac{2}{3})} = K^1\), and the \(L\) terms cancel.
 
-    <!-- DIFFERENTIATION RULES -->
-    <div class="card">
-      <h2>Differentiation Rules</h2>
-      <div class="rules-grid">
-        <div class="rule-card">
-          <h4>Power Rule</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[x^n\right] = n x^{n-1} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Constant Multiple</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[cf(x)\right] = c\,f'(x) \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Sum / Difference</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[f \pm g\right] = f'(x) \pm g'(x) \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Product Rule</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[f \cdot g\right] = f'g + fg' \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Quotient Rule</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\!\left[\dfrac{f}{g}\right] = \dfrac{f'g - fg'}{g^2} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Chain Rule</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[f(g(x))\right] = f'(g(x)) \cdot g'(x) \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Exponential</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[e^{f(x)}\right] = f'(x) \cdot e^{f(x)} \)</div>
-        </div>
-        <div class="rule-card">
-          <h4>Logarithm</h4>
-          <div class="rule-item">\( \dfrac{d}{dx}\left[\ln f(x)\right] = \dfrac{f'(x)}{f(x)} \)</div>
-        </div>
-      </div>
-    </div>
+Q: Simplify \((8K)^{\frac{2}{3}}\).
++ \(4K^{\frac{2}{3}}\)
+- \(8K^{\frac{2}{3}}\)
+- \(\frac{16}{3}K^{\frac{2}{3}}\)
+- \(4K\)
+W: Both parts get the power: \(8^{\frac{2}{3}} \times K^{\frac{2}{3}} = 4K^{\frac{2}{3}}\).
 
-    <!-- 3D STATIONARY POINT RULES -->
-    <div class="card">
-      <h2>Stationary Points of 3D Functions</h2>
-      <p class="mb-2">For a function \(f(x, y)\), stationary points occur where \(f_x = 0\) and \(f_y = 0\). To classify them, compute the <strong>Hessian determinant</strong>:</p>
-      <div class="rule-card mb-2" style="border-left-color: #dd6b20;">
-        <h4>Hessian</h4>
-        <div class="rule-item">\( H = f_{xx} \cdot f_{yy} - (f_{xy})^2 \)</div>
-      </div>
-      <div class="rules-grid">
-        <div class="rule-card" style="border-left-color: #38a169;">
-          <h4>Maximum</h4>
-          <div class="rule-item">\( H > 0 \) and \( f_{xx} < 0 \)</div>
-        </div>
-        <div class="rule-card" style="border-left-color: #38a169;">
-          <h4>Minimum</h4>
-          <div class="rule-item">\( H > 0 \) and \( f_{xx} > 0 \)</div>
-        </div>
-        <div class="rule-card" style="border-left-color: #e53e3e;">
-          <h4>Saddle Point</h4>
-          <div class="rule-item">\( H < 0 \)</div>
-        </div>
-        <div class="rule-card" style="border-left-color: #718096;">
-          <h4>Inconclusive</h4>
-          <div class="rule-item">\( H = 0 \)</div>
-        </div>
-      </div>
-    </div>
+Q: Solve \(L = 8K\) and \(K + L = 45\).
++ \(K = 5,\ L = 40\)
+- \(K = 40,\ L = 5\)
+- \(K = 9,\ L = 36\)
+- \(K = 4.5,\ L = 36\)
+W: Substitute: \(K + 8K = 9K = 45\), so \(K = 5\) and \(L = 40\).
 
-    <!-- CONCAVITY / CONVEXITY -->
-    <div class="card">
-      <h2>Concavity &amp; Convexity</h2>
-      <div class="rules-grid">
-        <div class="rule-card" style="border-left-color: #38a169;">
-          <h4>Concave (curves down)</h4>
-          <div class="rule-item">\( f''(x) < 0 \)</div>
-        </div>
-        <div class="rule-card" style="border-left-color: #dd6b20;">
-          <h4>Convex (curves up)</h4>
-          <div class="rule-item">\( f''(x) > 0 \)</div>
-        </div>
-        <div class="rule-card" style="border-left-color: #805ad5;">
-          <h4>Inflection Point</h4>
-          <div class="rule-item">\( f''(x) = 0 \) (and sign change)</div>
-        </div>
-      </div>
-    </div>
+Q: Solve \(2K + L = 60\) and \(L = 4K\).
++ \(K = 10,\ L = 40\)
+- \(K = 40,\ L = 10\)
+- \(K = 15,\ L = 60\)
+- \(K = 6,\ L = 24\)
+W: Substitute: \(2K + 4K = 6K = 60\), so \(K = 10\), \(L = 40\).
 
-  </div>
+Q: Solve \(K^{\frac{1}{3}}(8K)^{\frac{2}{3}} = 40\).
++ \(K = 10\)
+- \(K = 5\)
+- \(K = 40\)
+- \(K = \frac{40}{8}\)
+W: \(K^{\frac{1}{3}} \times 4K^{\frac{2}{3}} = 4K = 40\), so \(K = 10\).
 
-  <!-- QUIZ SUB-SECTION -->
-  <div id="kf-quiz" class="sub-section">
-    <div class="card">
-      <h2>Test Your Knowledge</h2>
-      <p class="text-muted mb-2">Answer each question. Your score updates as you go.</p>
-      <div class="score-text" id="kf-score-text">Score: 0 / 0</div>
-      <div class="score-bar"><div class="score-bar-fill" id="kf-score-bar" style="width:0%"></div></div>
-      <div class="btn-group mb-2">
-        <button class="btn btn-primary" onclick="generateKeyFactsQuiz()">New Quiz</button>
-      </div>
-      <div id="kf-quiz-container" class="quiz-container"></div>
-    </div>
-  </div>
+Q: Solve \(3x + 2y = 24\) and \(3x = 2y\).
++ \(x = 4,\ y = 6\)
+- \(x = 6,\ y = 4\)
+- \(x = 4,\ y = 3\)
+- \(x = 8,\ y = 12\)
+W: \(2y + 2y = 24\), so \(y = 6\) and \(x = 4\).
 
-</div>
+## S2 | Logs and exponentials | Lecture 1 | 1
+K: \(\ln\) undoes \(e\): \(\ln(e^x) = x\) and \(e^{\ln x} = x\). Also \(\ln 1 = 0\), \(\ln e = 1\).
+K: \(\ln(ab) = \ln a + \ln b\), \(\quad \ln\left(\frac{a}{b}\right) = \ln a - \ln b\), \(\quad \ln(a^n) = n\ln a\)
+K: The log trick: \(\ln\left(x^ay^b\right) = a\ln x + b\ln y\).
 
-<!-- ============================================================ -->
-<!-- TAB 2: GRAPH DRAWING                                         -->
-<!-- ============================================================ -->
-<div id="tab-graphing" class="tab-content">
+Q: Simplify \(\ln\left(e^5\right)\).
++ \(5\)
+- \(5e\)
+- \(e^5\)
+- \(1\)
+W: \(\ln\) undoes \(e\): \(\ln(e^x) = x\).
 
-  <div class="section-toggle">
-    <button class="active" data-sub="gd-solver">Graph &amp; Analyse</button>
-    <button data-sub="gd-quiz">Test Yourself</button>
-  </div>
+Q: \(\ln a + \ln b\) equals:
++ \(\ln(ab)\)
+- \(\ln(a + b)\)
+- \(\ln a \times \ln b\)
+- \((\ln a)^b\)
+W: Adding logs multiplies the insides.
 
-  <div id="gd-solver" class="sub-section active">
-    <div class="card">
-      <h2>Graph Drawing &amp; 7-Point Analysis</h2>
-      <p class="text-muted mb-2">Enter a function of \(x\) below. Use standard notation: <code>x^3</code>, <code>sqrt(x)</code>, <code>exp(x)</code>, <code>log(x)</code> for ln. Use <code>*</code> for multiplication.</p>
-      <div class="input-group">
-        <label>f(x) =</label>
-        <input type="text" id="graph-func" placeholder="e.g. x^3 - 6*x^2 + 9*x" value="x^3 - 6*x^2 + 9*x">
-        <div class="hint">Try an example:
-          <a href="#" onclick="setGraphExample('x^3 - 6*x^2 + 9*x', -2, 8); return false;">Cubic</a> |
-          <a href="#" onclick="setGraphExample('x^4 - 8*x^2 + 12', -4, 4); return false;">Quartic</a> |
-          <a href="#" onclick="setGraphExample('exp(x) - 2*x', -2, 4); return false;">Exponential</a> |
-          <a href="#" onclick="setGraphExample('log(x^2 + 1)', -5, 5); return false;">Log</a>
-        </div>
-      </div>
-      <div class="input-row">
-        <div class="input-group">
-          <label>x min</label>
-          <input type="number" id="graph-xmin" value="-2">
-        </div>
-        <div class="input-group">
-          <label>x max</label>
-          <input type="number" id="graph-xmax" value="8">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="drawGraph()">Plot &amp; Analyse</button>
-        <button class="btn btn-secondary" onclick="clearGraph()">Clear</button>
-      </div>
-      <div id="graph-error" class="error-msg"></div>
-      <div id="graph-plot" class="graph-container"></div>
-      <div id="graph-analysis" class="solution-output"></div>
-    </div>
-  </div>
+Q: \(\ln\left(x^3y\right) - \ln(xy)\) equals:
++ \(2\ln x\)
+- \(\ln(2x)\)
+- \(3\)
+- \(2\ln x + \ln y\)
+W: \(\ln\dfrac{x^3y}{xy} = \ln x^2 = 2\ln x\).
 
-  <div id="gd-quiz" class="sub-section">
-    <div class="card">
-      <h2>Test Your Graph Drawing Skills</h2>
-      <p class="text-muted mb-2">Analyse the function and answer the questions.</p>
-      <div class="score-text" id="gd-score-text">Score: 0 / 0</div>
-      <div class="score-bar"><div class="score-bar-fill" id="gd-score-bar" style="width:0%"></div></div>
-      <div class="btn-group mb-2">
-        <button class="btn btn-primary" onclick="generateGraphQuiz()">New Question</button>
-      </div>
-      <div id="gd-quiz-container" class="quiz-container"></div>
-    </div>
-  </div>
-</div>
+Q: If \(e^{2t} = 9\), then \(t\) is:
++ \(\ln 3\)
+- \(4.5\)
+- \(\ln 4.5\)
+- \(2\ln 9\)
+W: Take logs: \(2t = \ln 9 = 2\ln 3\), so \(t = \ln 3\).
 
-<!-- ============================================================ -->
-<!-- TAB 3: LAGRANGIAN SOLVER                                     -->
-<!-- ============================================================ -->
-<div id="tab-lagrangian" class="tab-content">
+Q: \(\ln\left(x^{\frac{1}{2}}y^{\frac{1}{4}}\right)\) equals:
++ \(\frac{1}{2}\ln x + \frac{1}{4}\ln y\)
+- \(\frac{1}{2}\ln x \times \frac{1}{4}\ln y\)
+- \(\frac{1}{8}\ln(xy)\)
+- \(\ln\left(\frac{1}{2}x\right) + \ln\left(\frac{1}{4}y\right)\)
+W: The log of a product is a sum, and powers come out in front. This is the log trick for problem D.
 
-  <div class="section-toggle">
-    <button class="active" data-sub="lg-solver">Solver</button>
-    <button data-sub="lg-quiz">Test Yourself</button>
-  </div>
+Q: What is \(e^{\ln 7}\)?
++ \(7\)
+- \(\ln 7\)
+- \(7e\)
+- \(1\)
+W: \(e\) undoes \(\ln\).
 
-  <div id="lg-solver" class="sub-section active">
-    <div class="card">
-      <h2>Lagrangian Solver</h2>
-      <p class="text-muted mb-2">Solve constrained optimisation problems of the form: maximise/minimise \(f(x,y) = A\,x^a\,y^b\) subject to \(p_1 x + p_2 y = M\).</p>
-      <div class="hint mb-2">Load an example:
-        <a href="#" onclick="setLgExample('min',1,0.5,0.5,10,15,120); return false;">Cost min (Exam Q3a)</a> |
-        <a href="#" onclick="setLgExample('max',1,0.5,0.5,2,3,100); return false;">Utility max</a> |
-        <a href="#" onclick="setLgExample('min',1,0.25,0.75,40,10,100); return false;">Resit Q3a</a>
-      </div>
+Q: What is \(\ln 1\)?
++ \(0\)
+- \(1\)
+- \(e\)
+- undefined
+W: \(e^0 = 1\), so \(\ln 1 = 0\).
 
-      <div class="input-group">
-        <label>Problem type</label>
-        <select id="lg-type">
-          <option value="max">Maximise</option>
-          <option value="min">Minimise</option>
-        </select>
-      </div>
+Q: Simplify \(\ln\left(3x^2y\right)\).
++ \(\ln 3 + 2\ln x + \ln y\)
+- \(3 + 2\ln x + \ln y\)
+- \(2\ln(3xy)\)
+- \(6\ln(xy)\)
+W: Split the product into a sum of logs, and bring the power 2 down.
 
-      <h3>Objective: \(f(x,y) = A\,x^a\,y^b\)</h3>
-      <div class="input-row">
-        <div class="input-group">
-          <label>A</label>
-          <input type="number" id="lg-A" value="1" step="any">
-        </div>
-        <div class="input-group">
-          <label>a (power of x)</label>
-          <input type="number" id="lg-a" value="0.5" step="any">
-        </div>
-        <div class="input-group">
-          <label>b (power of y)</label>
-          <input type="number" id="lg-b" value="0.5" step="any">
-        </div>
-      </div>
+Q: Why can we maximise \(\ln u\) instead of \(u\)?
++ \(\ln\) is an increasing function, so the same bundle maximises both
+- \(\ln u\) is always bigger than \(u\)
+- \(\ln u = u\) at the optimum
+- It is only allowed when \(u\) is linear
+W: Because \(\ln\) is increasing, whatever makes \(u\) biggest also makes \(\ln u\) biggest.
 
-      <h3>Constraint: \(p_1 x + p_2 y = M\)</h3>
-      <div class="input-row">
-        <div class="input-group">
-          <label>\(p_1\) (price/cost of x)</label>
-          <input type="number" id="lg-p1" value="10" step="any">
-        </div>
-        <div class="input-group">
-          <label>\(p_2\) (price/cost of y)</label>
-          <input type="number" id="lg-p2" value="15" step="any">
-        </div>
-        <div class="input-group">
-          <label>M (budget / output target)</label>
-          <input type="number" id="lg-M" value="120" step="any">
-        </div>
-      </div>
+Q: Solve \(16 = 2^{x}\).
++ \(x = 4\)
+- \(x = 8\)
+- \(x = 3\)
+- \(x = \ln 8\)
+W: \(2^4 = 16\). (Or take logs: \(x\ln 2 = \ln 16 = 4\ln 2\).)
 
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="solveLagrangian()">Solve Step-by-Step</button>
-        <button class="btn btn-secondary" onclick="clearLagrangian()">Clear</button>
-      </div>
-      <div id="lg-error" class="error-msg"></div>
-      <div id="lg-solution" class="solution-output"></div>
-    </div>
-  </div>
+## S3 | Basic differentiation | Lecture 2 | 2
+K: Power rule: \(\dfrac{d}{dx}\left(x^n\right) = nx^{n-1}\). Constants differentiate to 0.
+K: Marginal cost is \(C'(q)\); the marginal product of labour is \(\dfrac{dY}{dL}\).
+K: The second derivative \(f''(x)\) is the derivative of \(f'(x)\).
 
-  <div id="lg-quiz" class="sub-section">
-    <div class="card">
-      <h2>Test Your Lagrangian Skills</h2>
-      <p class="text-muted mb-2">Solve the constrained optimisation problem step by step.</p>
-      <div class="score-text" id="lg-score-text">Score: 0 / 0</div>
-      <div class="score-bar"><div class="score-bar-fill" id="lg-score-bar" style="width:0%"></div></div>
-      <div class="btn-group mb-2">
-        <button class="btn btn-primary" onclick="generateLagrangianQuiz()">New Question</button>
-      </div>
-      <div id="lg-quiz-container" class="quiz-container"></div>
-    </div>
-  </div>
-</div>
+Q: Differentiate \(5x^4\).
++ \(20x^3\)
+- \(5x^3\)
+- \(20x^5\)
+- \(4x^5\)
+W: Bring the power down and reduce it by one: \(5 \times 4x^3\).
 
-<!-- ============================================================ -->
-<!-- TAB 4: 3D STATIONARY POINTS                                  -->
-<!-- ============================================================ -->
-<div id="tab-stationary" class="tab-content">
+Q: Differentiate \(3x^4 - \dfrac{2}{x} + 5\).
++ \(12x^3 + 2x^{-2}\)
+- \(12x^3 - 2x^{-2}\)
+- \(12x^3 + 2x^{-2} + 5\)
+- \(3x^3 - 2\ln x\)
+W: Write \(\frac{2}{x} = 2x^{-1}\): its derivative is \(-2x^{-2}\), so \(-\frac{2}{x}\) gives \(+2x^{-2}\). The constant goes.
 
-  <div class="section-toggle">
-    <button class="active" data-sub="sp-solver">Solver</button>
-    <button data-sub="sp-quiz">Test Yourself</button>
-  </div>
+Q: Differentiate \(6\sqrt{x}\).
++ \(3x^{-\frac{1}{2}}\)
+- \(6x^{-\frac{1}{2}}\)
+- \(3x^{\frac{1}{2}}\)
+- \(12x^{\frac{3}{2}}\)
+W: \(6x^{\frac{1}{2}}\) differentiates to \(6 \times \frac{1}{2}x^{-\frac{1}{2}}\).
 
-  <div id="sp-solver" class="sub-section active">
-    <div class="card">
-      <h2>3D Stationary Points Finder</h2>
-      <p class="text-muted mb-2">Enter a function of \(x\) and \(y\). Use <code>*</code> for multiplication. For example: <code>x^3 + y^3 - 3*x*y</code></p>
-      <div class="input-group">
-        <label>\(f(x,y) =\)</label>
-        <input type="text" id="sp-func" placeholder="e.g. x^3 + y^3 - 3*x*y" value="x^3 + y^3 - 3*x*y">
-        <div class="hint">Try an example:
-          <a href="#" onclick="document.getElementById('sp-func').value='x^3 + y^3 - 3*x*y'; return false;">Cubic</a> |
-          <a href="#" onclick="document.getElementById('sp-func').value='x^2 + y^2 - 4*x - 6*y + 13'; return false;">Quadratic (min)</a> |
-          <a href="#" onclick="document.getElementById('sp-func').value='x^2 - y^2'; return false;">Saddle</a> |
-          <a href="#" onclick="document.getElementById('sp-func').value='x^2 + x*y + y^2 - 3*x'; return false;">Mixed terms</a>
-        </div>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="solveStationaryPoints()">Find Stationary Points</button>
-        <button class="btn btn-secondary" onclick="clearStationary()">Clear</button>
-      </div>
-      <div id="sp-error" class="error-msg"></div>
-      <div id="sp-solution" class="solution-output"></div>
-    </div>
-  </div>
+Q: \(C(q) = q^3 - 6q^2 + 20q + 50\). What is marginal cost when \(q = 2\)?
++ \(8\)
+- \(74\)
+- \(37\)
+- \(20\)
+W: \(MC = 3q^2 - 12q + 20 = 12 - 24 + 20 = 8\). (74 is the total cost, 37 the average cost.)
 
-  <div id="sp-quiz" class="sub-section">
-    <div class="card">
-      <h2>Test Your Skills</h2>
-      <p class="text-muted mb-2">Find and classify the stationary points of the given function.</p>
-      <div class="score-text" id="sp-score-text">Score: 0 / 0</div>
-      <div class="score-bar"><div class="score-bar-fill" id="sp-score-bar" style="width:0%"></div></div>
-      <div class="btn-group mb-2">
-        <button class="btn btn-primary" onclick="generateStationaryQuiz()">New Question</button>
-      </div>
-      <div id="sp-quiz-container" class="quiz-container"></div>
-    </div>
-  </div>
-</div>
+Q: \(Y = 10L^{\frac{1}{2}}\). What is the marginal product of labour?
++ \(5L^{-\frac{1}{2}}\)
+- \(10L^{-\frac{1}{2}}\)
+- \(5L^{\frac{1}{2}}\)
+- \(20L^{\frac{3}{2}}\)
+W: \(10 \times \frac{1}{2}L^{-\frac{1}{2}}\).
 
-<!-- ============================================================ -->
-<!-- TAB 5: HOMOGENEITY                                           -->
-<!-- ============================================================ -->
-<div id="tab-homogeneity" class="tab-content">
+Q: Find \(f''(x)\) for \(f(x) = x^4 - 3x^2\).
++ \(12x^2 - 6\)
+- \(4x^3 - 6x\)
+- \(12x^2 - 6x\)
+- \(12x - 6\)
+W: \(f'(x) = 4x^3 - 6x\), then differentiate again.
 
-  <div class="section-toggle">
-    <button class="active" data-sub="hg-solver">Solver</button>
-    <button data-sub="hg-quiz">Test Yourself</button>
-  </div>
+Q: Differentiate \(\dfrac{x^3}{3} + 4x\).
++ \(x^2 + 4\)
+- \(x^2 + 4x\)
+- \(3x^2 + 4\)
+- \(\frac{x^4}{12} + 2x^2\)
+W: \(\frac{1}{3} \times 3x^2 + 4\).
 
-  <div id="hg-solver" class="sub-section active">
-    <div class="card">
-      <h2>Homogeneity Solver</h2>
-      <p class="text-muted mb-2">Test whether a Cobb-Douglas function \(f(x,y) = A\,x^a\,y^b\) is homogeneous, using both Euler's theorem and the scaling method.</p>
-      <div class="hint mb-2">Load an example:
-        <a href="#" onclick="setHgExample(1,0.75,0.75); return false;">Exam Q2 (IRS)</a> |
-        <a href="#" onclick="setHgExample(1,0.5,0.5); return false;">CRS</a> |
-        <a href="#" onclick="setHgExample(1,0.3,0.5); return false;">DRS</a> |
-        <a href="#" onclick="setHgExample(1,1,1); return false;">Resit Q2</a>
-      </div>
+Q: The gradient of \(y = x^2 - 4x\) at \(x = 3\) is:
++ \(2\)
+- \(-3\)
+- \(6\)
+- \(0\)
+W: \(y' = 2x - 4 = 6 - 4 = 2\).
 
-      <h3>Function: \(f(x,y) = A\,x^a\,y^b\)</h3>
-      <div class="input-row">
-        <div class="input-group">
-          <label>A</label>
-          <input type="number" id="hg-A" value="1" step="any">
-        </div>
-        <div class="input-group">
-          <label>a (power of x)</label>
-          <input type="number" id="hg-a" value="0.75" step="any">
-        </div>
-        <div class="input-group">
-          <label>b (power of y)</label>
-          <input type="number" id="hg-b" value="0.75" step="any">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="solveHomogeneity()">Solve Step-by-Step</button>
-        <button class="btn btn-secondary" onclick="clearHomogeneity()">Clear</button>
-      </div>
-      <div id="hg-error" class="error-msg"></div>
-      <div id="hg-solution" class="solution-output"></div>
-    </div>
-  </div>
+## S4 | Stationary points and concavity | Lectures 2 and 3 | 2,3
+K: Stationary points: solve \(f'(x) = 0\). Then \(f'' < 0\): maximum; \(f'' > 0\): minimum.
+K: Concave where \(f''(x) < 0\); convex where \(f''(x) > 0\).
+K: A local maximum need not be global: check the ends of the range and what happens as \(x \to \pm\infty\).
+K: As \(x \to \pm\infty\) the highest power of \(x\) dominates.
 
-  <div id="hg-quiz" class="sub-section">
-    <div class="card">
-      <h2>Test Your Knowledge</h2>
-      <p class="text-muted mb-2">Determine the degree of homogeneity and returns to scale.</p>
-      <div class="score-text" id="hg-score-text">Score: 0 / 0</div>
-      <div class="score-bar"><div class="score-bar-fill" id="hg-score-bar" style="width:0%"></div></div>
-      <div class="btn-group mb-2">
-        <button class="btn btn-primary" onclick="generateHomogeneityQuiz()">New Question</button>
-      </div>
-      <div id="hg-quiz-container" class="quiz-container"></div>
-    </div>
-  </div>
-</div>
+Q: \(f(x) = x^3 - 3x^2\) has\ldots
++ a maximum at \(x = 0\) and a minimum at \(x = 2\)
+- a minimum at \(x = 0\) and a maximum at \(x = 2\)
+- minima at \(x = 0\) and \(x = 2\)
+- one stationary point, at \(x = 3\)
+W: \(f' = 3x(x - 2)\), \(f'' = 6x - 6\): \(f''(0) = -6 < 0\), \(f''(2) = 6 > 0\).
 
-</main>
+Q: For which values of \(x\) is \(f(x) = 2x^3 - 12x^2 + 5\) concave?
++ \(x < 2\)
+- \(x > 2\)
+- \(x < 4\)
+- all \(x\)
+W: \(f'' = 12x - 24 < 0\) when \(x < 2\).
 
-<!-- ==================== JAVASCRIPT ==================== -->
+Q: \(f(x) = x^3 - 3x\) has a stationary point at \(x = -1\). Which is true?
++ It is a local maximum, but not a global maximum
+- It is a global maximum
+- It is a local minimum
+- It is not a stationary point
+W: \(f''(-1) = -6 < 0\), but \(f(x) \to \infty\) as \(x \to \infty\), so it isn't the highest point overall.
+
+Q: As \(x \to \infty\), \(f(x) = 5 + 3x^2 - x^3\) tends to:
++ \(-\infty\)
+- \(+\infty\)
+- \(5\)
+- \(0\)
+W: The highest power, \(-x^3\), dominates.
+
+Q: As \(x \to -\infty\), \(f(x) = x^4 - 4x^3\) tends to:
++ \(+\infty\)
+- \(-\infty\)
+- \(0\)
+- \(-4\)
+W: \(x^4\) dominates and is positive for negative \(x\) too.
+
+Q: At a stationary point, \(f''(x) = 0\). What can you conclude?
++ Nothing yet: the second derivative test is inconclusive
+- It is a maximum
+- It is a minimum
+- It is not a stationary point
+W: The test only works when \(f'' \neq 0\). Look at the sign of \(f'\) either side instead.
+
+Q: For \(0 \leq x \leq 3\), where is the lowest value of \(c(x) = 1 + 4x - x^2\)?
++ At \(x = 0\) (an end of the range)
+- At \(x = 2\) (the stationary point)
+- At \(x = 3\)
+- There is no lowest value
+W: \(x = 2\) is a maximum (\(c'' = -2\)). Comparing the ends: \(c(0) = 1\), \(c(3) = 4\).
+
+Q: \(f(x) = x^2(x - 6)\) crosses the \(x\)-axis at:
++ \(x = 0\) and \(x = 6\)
+- \(x = 0\) and \(x = -6\)
+- \(x = 6\) only
+- \(x = 0\) and \(x = 4\)
+W: A product is zero when either part is zero. (\(x = 4\) is a stationary point, not a root.)
+
+Q: A function with \(f''(x) > 0\) for all \(x\) is:
++ convex, and any stationary point is a global minimum
+- concave, and any stationary point is a global maximum
+- increasing everywhere
+- linear
+W: Positive \(f''\) everywhere means the curve bends upwards everywhere.
+
+## S5 | Product, chain, quotient; exp and ln | Lecture 3 | 3
+K: Product: \((uv)' = u'v + uv'\). \(\quad\) Chain: \(\dfrac{dy}{dx} = \dfrac{dy}{du}\dfrac{du}{dx}\).
+K: \(\dfrac{d}{dx}e^{f(x)} = f'(x)e^{f(x)}\), \(\quad \dfrac{d}{dx}\ln f(x) = \dfrac{f'(x)}{f(x)}\).
+K: Quotient: \(\left(\dfrac{u}{v}\right)' = \dfrac{u'v - uv'}{v^2}\).
+K: Treat any other letter, like \(a\) or \(y\), as a number: \(\dfrac{d}{dx}e^{xy} = ye^{xy}\).
+
+Q: Differentiate \(x^2(3x + 1)^4\).
++ \(2x(3x + 1)^4 + 12x^2(3x + 1)^3\)
+- \(24x(3x + 1)^3\)
+- \(2x(3x + 1)^4 + 4x^2(3x + 1)^3\)
+- \(8x(3x + 1)^3\)
+W: Product rule; the chain rule gives \(4(3x + 1)^3 \times 3\).
+
+Q: Differentiate \(e^{x^2 + 3x}\).
++ \((2x + 3)e^{x^2 + 3x}\)
+- \(e^{x^2 + 3x}\)
+- \((x^2 + 3x)e^{x^2 + 3x - 1}\)
+- \((2x + 3)e^{2x + 3}\)
+W: The exponential stays the same, times the derivative of the power.
+
+Q: Differentiate \(\ln\left(4x^2 + 1\right)\).
++ \(\dfrac{8x}{4x^2 + 1}\)
+- \(\dfrac{1}{4x^2 + 1}\)
+- \(\dfrac{1}{8x}\)
+- \(8x\ln\left(4x^2 + 1\right)\)
+W: \(\frac{f'}{f}\) with \(f = 4x^2 + 1\).
+
+Q: Differentiate \(\dfrac{x}{x + 1}\).
++ \(\dfrac{1}{(x + 1)^2}\)
+- \(-\dfrac{1}{(x + 1)^2}\)
+- \(\dfrac{2x + 1}{(x + 1)^2}\)
+- \(1\)
+W: \(\frac{1 \times (x + 1) - x \times 1}{(x + 1)^2}\).
+
+Q: Differentiate \((1 - 8x)^5\).
++ \(-40(1 - 8x)^4\)
+- \(5(1 - 8x)^4\)
+- \(40(1 - 8x)^4\)
+- \(-8(1 - 8x)^5\)
+W: Chain rule: \(5(1 - 8x)^4 \times (-8)\).
+
+Q: Treating \(y\) as a constant, differentiate \(e^{3xy}\) with respect to \(x\).
++ \(3ye^{3xy}\)
+- \(e^{3xy}\)
+- \(3xe^{3xy}\)
+- \(3xye^{3xy - 1}\)
+W: \(3y\) is just a number, like the \(a\) in \(e^{ax}\).
+
+Q: Treating \(y\) as a constant, differentiate \(xe^{xy}\) with respect to \(x\).
++ \((1 + xy)e^{xy}\)
+- \(ye^{xy}\)
+- \(xye^{xy}\)
+- \(e^{xy}\)
+W: Product rule: \(1 \times e^{xy} + x \times ye^{xy}\).
+
+Q: Differentiate \(\frac{1}{2}\ln x + \frac{1}{4}\ln y\) with respect to \(x\).
++ \(\dfrac{1}{2x}\)
+- \(\dfrac{1}{2x} + \dfrac{1}{4y}\)
+- \(\frac{1}{2}\ln x\)
+- \(\dfrac{2}{x}\)
+W: \(\frac{1}{4}\ln y\) doesn't depend on \(x\), so it disappears.
+
+Q: Differentiate \(3qe^{q^2}\).
++ \(3e^{q^2} + 6q^2e^{q^2}\)
+- \(6qe^{q^2}\)
+- \(3e^{q^2}\)
+- \(3e^{q^2} + 3q^2e^{q^2}\)
+W: Product rule; the chain rule gives \(\frac{d}{dq}e^{q^2} = 2qe^{q^2}\).
+
+Q: Differentiate \(\ln(5x)\).
++ \(\dfrac{1}{x}\)
+- \(\dfrac{1}{5x}\)
+- \(\dfrac{5}{x}\)
+- \(5\ln x\)
+W: \(\frac{5}{5x} = \frac{1}{x}\). Or: \(\ln(5x) = \ln 5 + \ln x\).
+
+## S6 | Partial derivatives | Lecture 4 | 4
+K: \(\dfrac{\partial f}{\partial x}\): differentiate with respect to \(x\), treating \(y\) as a constant.
+K: Second order: \(f_{xx}\), \(f_{yy}\), and the cross-partials \(f_{xy} = f_{yx}\).
+K: Partial derivatives are THE tool for problems C and D.
+
+Q: For \(f(x, y) = x^2y^3 + 4x\), \(f_x\) is:
++ \(2xy^3 + 4\)
+- \(3x^2y^2\)
+- \(2xy^3\)
+- \(2x + 3y^2 + 4\)
+W: Treat \(y\) as a constant.
+
+Q: For \(f(x, y) = x^2y^3 + 4x\), \(f_y\) is:
++ \(3x^2y^2\)
+- \(3x^2y^2 + 4\)
+- \(2xy^3\)
+- \(3y^2\)
+W: Treat \(x\) as a constant; \(4x\) differentiates to 0.
+
+Q: For \(f(x, y) = e^{xy}\), the cross-partial \(f_{xy}\) is:
++ \((1 + xy)e^{xy}\)
+- \(xye^{xy}\)
+- \(e^{xy}\)
+- \(y^2e^{xy}\)
+W: \(f_x = ye^{xy}\); then the product rule in \(y\): \(e^{xy} + y \times xe^{xy}\).
+
+Q: For \(g(x, y) = e^{xy} + x^2 - y^2\), \(g_{xx}\) is:
++ \(y^2e^{xy} + 2\)
+- \(ye^{xy} + 2\)
+- \(x^2e^{xy} - 2\)
+- \(2\)
+W: \(g_x = ye^{xy} + 2x\); differentiate again with respect to \(x\).
+
+Q: \(Y = 5K^{\frac{1}{3}}L^{\frac{2}{3}}\). The marginal product of labour is:
++ \(\frac{10}{3}K^{\frac{1}{3}}L^{-\frac{1}{3}}\)
+- \(\frac{5}{3}K^{-\frac{2}{3}}L^{\frac{2}{3}}\)
+- \(\frac{10}{3}K^{\frac{1}{3}}L^{\frac{2}{3}}\)
+- \(\frac{2}{3}K^{\frac{1}{3}}L^{-\frac{1}{3}}\)
+W: Differentiate with respect to \(L\), treating \(K\) as a constant.
+
+Q: For \(z = x^3 + 4xy + 5y^2\), the four second-order partials are:
++ \(z_{xx} = 6x,\ z_{yy} = 10,\ z_{xy} = z_{yx} = 4\)
+- \(z_{xx} = 6x,\ z_{yy} = 10y,\ z_{xy} = 4,\ z_{yx} = 0\)
+- \(z_{xx} = 3x^2,\ z_{yy} = 10,\ z_{xy} = z_{yx} = 4\)
+- \(z_{xx} = 6x + 4,\ z_{yy} = 10,\ z_{xy} = z_{yx} = 0\)
+W: \(z_x = 3x^2 + 4y\), \(z_y = 4x + 10y\); differentiate each again.
+
+Q: \(Y = 5K^{\frac{1}{3}}L^{\frac{2}{3}}\). What happens to the MPL as \(L\) rises (holding \(K\) fixed)?
++ It falls: \(\frac{\partial^2 Y}{\partial L^2} < 0\)
+- It rises: \(\frac{\partial^2 Y}{\partial L^2} > 0\)
+- It stays constant
+- It depends on \(K\)
+W: \(\frac{\partial^2 Y}{\partial L^2} = -\frac{10}{9}K^{\frac{1}{3}}L^{-\frac{4}{3}} < 0\): diminishing returns to labour.
+
+Q: For \(f(x, y) = x^3e^{-y}\), \(f_y\) is:
++ \(-x^3e^{-y}\)
+- \(3x^2e^{-y}\)
+- \(x^3e^{-y}\)
+- \(-3x^2e^{-y}\)
+W: The chain rule gives \(\frac{\partial}{\partial y}e^{-y} = -e^{-y}\); \(x^3\) is a constant.
+
+## S7 | Homogeneity, returns to scale and Euler | Lectures 1 and 4 | 4
+K: \(f\) is homogeneous of degree \(n\) if \(f(\lambda x, \lambda y) = \lambda^n f(x, y)\).
+K: Euler: \(xf_x + yf_y = nf\).
+K: \(n > 1\): increasing; \(n = 1\): constant; \(n < 1\): decreasing returns to scale.
+K: Cobb-Douglas \(AK^aL^b\): the degree is \(a + b\) (the \(A\) doesn't matter).
+
+Q: \(Y = 4K^{0.3}L^{0.6}\) is homogeneous of degree\ldots
++ \(0.9\), with decreasing returns to scale
+- \(0.9\), with increasing returns to scale
+- \(3.6\), with increasing returns to scale
+- \(0.18\), with decreasing returns to scale
+W: Degree \(= 0.3 + 0.6 = 0.9 < 1\). The 4 doesn't matter.
+
+Q: For \(Y = K^{0.5}L^{0.7}\), \(K\frac{\partial Y}{\partial K} + L\frac{\partial Y}{\partial L}\) equals\ldots
++ \(1.2Y\), so increasing returns to scale
+- \(1.2Y\), so decreasing returns to scale
+- \(0.35Y\), so decreasing returns to scale
+- \(Y\), so constant returns to scale
+W: \(0.5Y + 0.7Y = 1.2Y\), and \(1.2 > 1\).
+
+Q: A firm with \(Y = K^{0.4}L^{0.6}\) doubles both inputs. Output\ldots
++ exactly doubles
+- more than doubles
+- less than doubles
+- rises by 40%
+W: Degree \(0.4 + 0.6 = 1\): constant returns to scale.
+
+Q: Is \(Y = KL + L\) homogeneous?
++ No: the two terms scale by different powers of \(\lambda\)
+- Yes, of degree 2
+- Yes, of degree 1
+- Yes, of degree 3
+W: \(\lambda^2KL + \lambda L\) can't be written as \(\lambda^n(KL + L)\).
+
+Q: \(f(x, y) = 2x^2y^2 + xy^3\) is homogeneous of degree:
++ \(4\)
+- \(2\)
+- \(3\)
+- \(7\)
+W: Every term has total power 4: \(f(\lambda x, \lambda y) = \lambda^4f\).
+
+Q: \(Y = 3K + 2L\) has\ldots
++ constant returns to scale
+- increasing returns to scale
+- decreasing returns to scale
+- no returns to scale (not homogeneous)
+W: \(3\lambda K + 2\lambda L = \lambda(3K + 2L)\): degree 1.
+
+Q: \(Y = K^{0.3}L^{0.9}\). Doubling both inputs multiplies output by:
++ \(2^{1.2} \approx 2.3\)
+- \(2.4\)
+- \(2\)
+- \(1.2\)
+W: Degree 1.2, so output is multiplied by \(2^{1.2}\).
+
+Q: Which production function has increasing returns to scale?
++ \(K^{2}L^{-0.5}\)
+- \(10K^{0.2}L^{0.7}\)
+- \(K^{0.5}L^{0.5}\)
+- \(5K^{0.25}L^{0.25}\)
+W: Degrees: \(1.5\), \(0.9\), \(1\), \(0.5\). Only the first is above 1.
+
+## S8 | MRS and the slope of an isoquant | Lecture 4 | 4
+K: Slope of the isoquant of \(z(x, y)\): \(\dfrac{dy}{dx} = -\dfrac{z_x}{z_y}\).
+K: \(MRS = -\dfrac{MU_1}{MU_2}\), \(\quad MRTS = -\dfrac{MPL}{MPK}\).
+K: MRS less negative as \(x_1\) rises: convex indifference curves.
+
+Q: The MRS for \(u = x_1^2x_2\) is:
++ \(-\dfrac{2x_2}{x_1}\)
+- \(-\dfrac{x_1}{2x_2}\)
+- \(-\dfrac{x_2}{x_1}\)
+- \(-2\)
+W: \(-\frac{MU_1}{MU_2} = -\frac{2x_1x_2}{x_1^2}\).
+
+Q: The MRS for \(u = x_1^ax_2^b\) is:
++ \(-\dfrac{ax_2}{bx_1}\)
+- \(-\dfrac{bx_1}{ax_2}\)
+- \(-\dfrac{a}{b}\)
+- \(-abx_1x_2\)
+W: \(-\frac{ax_1^{a-1}x_2^b}{bx_1^ax_2^{b-1}} = -\frac{ax_2}{bx_1}\).
+
+Q: The slope of the isoquant of \(z = x^2 + 2y^2\) at \((2, 1)\) is:
++ \(-1\)
+- \(-4\)
+- \(-\frac{1}{4}\)
+- \(1\)
+W: \(\frac{dy}{dx} = -\frac{2x}{4y} = -\frac{4}{4}\).
+
+Q: For \(u = 3x_1 + x_2\), the MRS is:
++ \(-3\) everywhere: straight-line indifference curves
+- \(-\frac{1}{3}\) everywhere
+- \(-\frac{3x_2}{x_1}\)
+- \(0\)
+W: \(MU_1 = 3\), \(MU_2 = 1\): the MRS is constant.
+
+Q: Along a Cobb-Douglas indifference curve, as \(x_1\) increases the MRS\ldots
++ becomes less negative: the curve gets flatter (convex)
+- becomes more negative: the curve gets steeper
+- stays constant
+- becomes positive
+W: \(MRS = -\frac{ax_2}{bx_1}\): more \(x_1\) and less \(x_2\) makes it smaller in size.
+
+Q: The MRTS for \(Y = K^{\frac{1}{3}}L^{\frac{2}{3}}\) (slope with \(K\) on the vertical axis) is:
++ \(-\dfrac{2K}{L}\)
+- \(-\dfrac{K}{2L}\)
+- \(-\dfrac{L}{2K}\)
+- \(-2\)
+W: \(-\frac{MPL}{MPK} = -\frac{\frac{2}{3}K^{\frac{1}{3}}L^{-\frac{1}{3}}}{\frac{1}{3}K^{-\frac{2}{3}}L^{\frac{2}{3}}} = -\frac{2K}{L}\).
+
+Q: Tony has \(u = x^4y^2\) and Gordon has \(v = \ln x + \frac{1}{2}\ln y\). Their MRSs are:
++ the same: \(-\frac{2y}{x}\)
+- different: Tony's is twice Gordon's
+- the same: \(-\frac{y}{2x}\)
+- not comparable
+W: \(v = \frac{1}{4}\ln u\) is an increasing transformation, so the MRS is the same.
+
+## S9 | Classifying stationary points of f(x, y) | Lecture 5 | 4
+K: First-order conditions: \(f_x = 0\) and \(f_y = 0\).
+K: Let \(D = f_{xx}f_{yy} - f_{xy}^2\). \(\ D > 0\) and \(f_{xx}, f_{yy} < 0\): maximum.
+K: \(D > 0\) and \(f_{xx}, f_{yy} > 0\): minimum. \(\ D < 0\): saddle point.
+K: At a point where \(y = 0\), every \(e^{xy}\) equals \(e^0 = 1\).
+
+Q: At a stationary point, \(f_{xx} = 3\), \(f_{yy} = 2\) and \(f_{xy} = 4\). The point is a:
++ saddle point
+- minimum
+- maximum
+- can't tell
+W: \(D = 6 - 16 = -10 < 0\).
+
+Q: At a stationary point, \(f_{xx} = -2\), \(f_{yy} = -6\) and \(f_{xy} = -1\). The point is a:
++ maximum
+- minimum
+- saddle point
+- can't tell
+W: \(D = 12 - 1 = 11 > 0\) and both are negative.
+
+Q: The first-order conditions for a stationary point of \(f(x, y)\) are:
++ \(f_x = 0\) and \(f_y = 0\)
+- \(f_{xx} = 0\) and \(f_{yy} = 0\)
+- \(f(x, y) = 0\)
+- \(f_x = f_y\)
+W: The slope must be zero in both directions.
+
+Q: A stationary point is a minimum if:
++ \(f_{xx} > 0\), \(f_{yy} > 0\) and \(f_{xx}f_{yy} - f_{xy}^2 > 0\)
+- \(f_{xx} > 0\) and \(f_{yy} > 0\)
+- \(f_{xx}f_{yy} - f_{xy}^2 < 0\)
+- \(f_{xx} < 0\), \(f_{yy} < 0\) and \(f_{xx}f_{yy} - f_{xy}^2 > 0\)
+W: Both own second derivatives positive is not enough: \(D > 0\) is needed too.
+
+Q: At the point \((2, 0)\), \(e^{xy}\) equals:
++ \(1\)
+- \(0\)
+- \(e^2\)
+- \(2\)
+W: \(xy = 0\), and \(e^0 = 1\).
+
+Q: Find the stationary point of \(f = -x^2 + xy - 2y^2 - 3x + 12y\).
++ \((0, 3)\)
+- \((3, 0)\)
+- \((-3, 12)\)
+- \((0, 0)\)
+W: \(f_x = -2x + y - 3 = 0\), \(f_y = x - 4y + 12 = 0\). Solving gives \(x = 0\), \(y = 3\).
+
+Q: \(f = x^3 - 3x + y^2 - 4y\). The stationary point at \((-1, 2)\) is a:
++ saddle point
+- maximum
+- minimum
+- not a stationary point
+W: \(f_{xx} = 6x = -6\), \(f_{yy} = 2\), \(f_{xy} = 0\): \(D = -12 < 0\).
+
+Q: How many stationary points does \(f = x^3 + y^3 - 3x - 3y\) have?
++ \(4\)
+- \(1\)
+- \(2\)
+- \(0\)
+W: \(x = \pm 1\) and \(y = \pm 1\) give four combinations: a min, a max and two saddles.
+
+## S10 | Setting up and solving Lagrangians | Lecture 6 | 5
+K: \(\mathcal{L} = \text{objective} - \lambda(\text{constraint expression} - \text{number})\).
+K: First-order conditions: \(\mathcal{L}_x = 0\), \(\mathcal{L}_y = 0\), \(\mathcal{L}_\lambda = 0\). Divide the first two so \(\lambda\) cancels.
+K: \(\lambda\) is the marginal value of the constraint: marginal cost (cost min) or marginal utility of income.
+K: For utility, take logs first: \(\ln\left(x^ay^b\right) = a\ln x + b\ln y\).
+
+Q: A consumer maximises \(u = x^{\frac{1}{2}}y^{\frac{1}{2}}\) with \(p_x = 3\), \(p_y = 2\), income 60. The Lagrangian is:
++ \(x^{\frac{1}{2}}y^{\frac{1}{2}} - \lambda(3x + 2y - 60)\)
+- \(x^{\frac{1}{2}}y^{\frac{1}{2}} - \lambda(2x + 3y - 60)\)
+- \(3x + 2y - \lambda\left(x^{\frac{1}{2}}y^{\frac{1}{2}} - 60\right)\)
+- \(x^{\frac{1}{2}}y^{\frac{1}{2}} - \lambda(3x + 2y)\)
+W: Objective minus \(\lambda\) times (spending minus income).
+
+Q: A firm minimises cost with \(r = 9\), \(w = 4\) to produce 60 units with \(Y = K^{\frac{1}{2}}L^{\frac{1}{2}}\). The Lagrangian is:
++ \(9K + 4L - \lambda\left(K^{\frac{1}{2}}L^{\frac{1}{2}} - 60\right)\)
+- \(K^{\frac{1}{2}}L^{\frac{1}{2}} - \lambda(9K + 4L - 60)\)
+- \(9K + 4L - \lambda\left(K^{\frac{1}{2}}L^{\frac{1}{2}}\right)\)
+- \(4K + 9L - \lambda\left(K^{\frac{1}{2}}L^{\frac{1}{2}} - 60\right)\)
+W: The objective is cost; the constraint is output \(= 60\).
+
+Q: Income is 100 now and nothing next period; the interest rate is 5%. The budget constraint is:
++ \(c_1 + \dfrac{c_2}{1.05} = 100\)
+- \(c_1 + c_2 = 100\)
+- \(c_1 + 1.05c_2 = 100\)
+- \(1.05c_1 + c_2 = 100\)
+W: \(c_2 = 1.05(100 - c_1)\); rearrange.
+
+Q: The FOCs include \(\dfrac{1}{2x} = 3\lambda\) and \(\dfrac{1}{2y} = 2\lambda\). Eliminating \(\lambda\) gives:
++ \(2y = 3x\)
+- \(3y = 2x\)
+- \(x = y\)
+- \(6xy = 1\)
+W: Divide: \(\frac{y}{x} = \frac{3}{2}\).
+
+Q: If \(2y = 3x\) and \(3x + 2y = 60\), then:
++ \(x = 10,\ y = 15\)
+- \(x = 15,\ y = 10\)
+- \(x = 12,\ y = 12\)
+- \(x = 20,\ y = 0\)
+W: \(3x + 3x = 60\).
+
+Q: In a cost minimisation problem, \(\lambda = 4\) at the optimum. This means:
++ one more unit of output would raise minimum cost by about 4
+- the firm uses 4 times as much labour as capital
+- the firm's profit is 4
+- output would rise by 4 if costs rose by 1
+W: \(\lambda\) is the marginal cost of output.
+
+Q: A worker has 16 hours, wage 10, other income 20; \(C\) is consumption and \(R\) leisure. The budget constraint is:
++ \(C + 10R = 180\)
+- \(C + 10R = 160\)
+- \(C = 10R + 20\)
+- \(C + R = 16\)
+W: \(C = 10(16 - R) + 20\); rearrange.
+
+Q: The FOCs for a cost minimisation give \(16 = \tfrac{1}{5}\lambda K^{-\frac{4}{5}}L^{\frac{4}{5}}\) and \(2 = \tfrac{4}{5}\lambda K^{\frac{1}{5}}L^{-\frac{1}{5}}\). Dividing gives:
++ \(L = 32K\)
+- \(K = 32L\)
+- \(L = 8K\)
+- \(L = 2K\)
+W: \(\frac{16}{2} = \frac{\frac{1}{5}K^{-\frac{4}{5}}L^{\frac{4}{5}}}{\frac{4}{5}K^{\frac{1}{5}}L^{-\frac{1}{5}}} = \frac{L}{4K}\), so \(L = 32K\).
+
+Q: Which statement about Method 1 (tangency) is right for cost minimisation?
++ Set \(\frac{w}{r} = \frac{MPL}{MPK}\) and use the output constraint
+- Set \(\frac{w}{r} = \frac{MPK}{MPL}\) and use the budget constraint
+- Set \(MPL = MPK\)
+- Set \(w = r\)
+W: The isocost slope equals the isoquant slope: \(\frac{w}{r} = \frac{MPL}{MPK}\).
+</script>
+
 <script>
-// ================================================================
-// NAVIGATION
-// ================================================================
-document.querySelectorAll('#main-nav button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-  });
-});
+// =====================================================================================
+// EXAM VARIANTS  (each run of an exam question picks one at random)
+// Correct answer first in every list; the app shuffles.  Maths uses \( \) as usual.
+// =====================================================================================
+const R = String.raw;
+const LIMITS = {
+  '+-': R`As \(x \to \infty\), \(f \to +\infty\); as \(x \to -\infty\), \(f \to -\infty\)`,
+  '-+': R`As \(x \to \infty\), \(f \to -\infty\); as \(x \to -\infty\), \(f \to +\infty\)`,
+  '++': R`\(f \to +\infty\) both as \(x \to \infty\) and as \(x \to -\infty\)`,
+  '--': R`\(f \to -\infty\) both as \(x \to \infty\) and as \(x \to -\infty\)`
+};
 
-document.querySelectorAll('.section-toggle').forEach(toggle => {
-  toggle.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const parent = toggle.parentElement;
-      parent.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
-      parent.querySelector('#' + btn.dataset.sub).classList.add('active');
+// ---- Problem A: sketching ----
+const A_VARIANTS = [
+ { f: R`x^3 - 6x^2`, fn: x => x**3 - 6*x**2, dom: [-2.5, 7.5],
+   yint: '0', roots: [R`\(x = 0\) and \(x = 6\)`, R`\(x = 0\) and \(x = -6\)`, R`\(x = 0\) and \(x = 4\)`, R`\(x = 6\) only`],
+   rootsWhy: R`\(f(0) = 0\). Factorise: \(x^2(x - 6) = 0\), so \(x = 0\) or \(x = 6\).`,
+   lim: '+-', limWhy: R`The highest power, \(x^3\), dominates.`,
+   fp: [R`\(3x^2 - 12x\)`, R`\(3x^2 - 6x\)`, R`\(x^2 - 12x\)`, R`\(3x^3 - 12x^2\)`],
+   sp: [R`\((0, 0)\) and \((4, -32)\)`, R`\((0, 0)\) and \((6, 0)\)`, R`\((0, 0)\) and \((-4, -160)\)`, R`\((4, -32)\) only`],
+   spWhy: R`\(f'(x) = 3x(x - 4) = 0\), so \(x = 0\) or \(4\); \(f(4) = 64 - 96 = -32\).`,
+   nat: [R`\((0, 0)\) is a maximum; \((4, -32)\) is a minimum`, R`\((0, 0)\) is a minimum; \((4, -32)\) is a maximum`, R`both are minima`, R`both are maxima`],
+   natWhy: R`\(f''(x) = 6x - 12\): \(f''(0) = -12 < 0\) (max), \(f''(4) = 12 > 0\) (min).`,
+   conc: [R`concave for \(x < 2\), convex for \(x > 2\)`, R`convex for \(x < 2\), concave for \(x > 2\)`, R`concave for \(x < 4\), convex for \(x > 4\)`, R`convex everywhere`],
+   concWhy: R`\(f''(x) = 6x - 12 = 0\) at \(x = 2\); negative to the left, positive to the right.` },
+ { f: R`x^4 - 2x^2`, fn: x => x**4 - 2*x**2, dom: [-1.9, 1.9],
+   roots: [R`\(x = 0\) and \(x = \pm\sqrt{2}\)`, R`\(x = 0\) and \(x = \pm 1\)`, R`\(x = \pm\sqrt{2}\) only`, R`\(x = 0\) and \(x = 2\)`],
+   rootsWhy: R`\(f(0) = 0\). Factorise: \(x^2(x^2 - 2) = 0\), so \(x = 0\) or \(x = \pm\sqrt{2} \approx \pm 1.41\).`,
+   lim: '++', limWhy: R`The highest power, \(x^4\), is positive for large positive and negative \(x\).`,
+   fp: [R`\(4x^3 - 4x\)`, R`\(4x^3 - 2x\)`, R`\(x^3 - 4x\)`, R`\(4x^3 - 4\)`],
+   sp: [R`\((0, 0)\), \((1, -1)\) and \((-1, -1)\)`, R`\((0, 0)\) and \((1, -1)\)`, R`\((0, 0)\), \((\sqrt{2}, 0)\) and \((-\sqrt{2}, 0)\)`, R`\((1, -1)\) and \((-1, -1)\)`],
+   spWhy: R`\(f'(x) = 4x(x - 1)(x + 1) = 0\), so \(x = 0, \pm 1\); \(f(\pm 1) = -1\).`,
+   nat: [R`\((0, 0)\) is a maximum; \((\pm 1, -1)\) are minima`, R`\((0, 0)\) is a minimum; \((\pm 1, -1)\) are maxima`, R`all three are minima`, R`\((1, -1)\) is a minimum; \((-1, -1)\) is a maximum`],
+   natWhy: R`\(f''(x) = 12x^2 - 4\): \(f''(0) = -4 < 0\), \(f''(\pm 1) = 8 > 0\).`,
+   conc: [R`concave for \(-0.58 < x < 0.58\), convex outside`, R`convex for \(-0.58 < x < 0.58\), concave outside`, R`concave for \(-1 < x < 1\), convex outside`, R`convex everywhere`],
+   concWhy: R`\(f''(x) = 12x^2 - 4 = 0\) at \(x = \pm\frac{1}{\sqrt{3}} \approx \pm 0.58\); negative between.` },
+ { f: R`-x^3 + 3x + 2`, fn: x => -(x**3) + 3*x + 2, dom: [-2.4, 2.7],
+   roots: [R`\(x = -1\) and \(x = 2\)`, R`\(x = 1\) and \(x = -2\)`, R`\(x = -1\) only`, R`\(x = 0\) and \(x = 2\)`],
+   rootsWhy: R`\(f(0) = 2\). Factorise: \(-(x + 1)^2(x - 2) = 0\), so \(x = -1\) (where it touches the axis) or \(x = 2\).`,
+   lim: '-+', limWhy: R`The highest power, \(-x^3\), dominates: negative for large positive \(x\).`,
+   fp: [R`\(-3x^2 + 3\)`, R`\(-3x^2 + 3x\)`, R`\(3x^2 + 3\)`, R`\(-x^2 + 3\)`],
+   sp: [R`\((1, 4)\) and \((-1, 0)\)`, R`\((1, 0)\) and \((-1, 4)\)`, R`\((-1, 0)\) and \((2, 0)\)`, R`\((0, 2)\) only`],
+   spWhy: R`\(f'(x) = -3(x - 1)(x + 1) = 0\), so \(x = \pm 1\); \(f(1) = 4\), \(f(-1) = 0\).`,
+   nat: [R`\((1, 4)\) is a maximum; \((-1, 0)\) is a minimum`, R`\((1, 4)\) is a minimum; \((-1, 0)\) is a maximum`, R`both are maxima`, R`both are minima`],
+   natWhy: R`\(f''(x) = -6x\): \(f''(1) = -6 < 0\) (max), \(f''(-1) = 6 > 0\) (min).`,
+   conc: [R`convex for \(x < 0\), concave for \(x > 0\)`, R`concave for \(x < 0\), convex for \(x > 0\)`, R`concave for \(-1 < x < 1\), convex outside`, R`concave everywhere`],
+   concWhy: R`\(f''(x) = -6x\): positive for \(x < 0\), negative for \(x > 0\).` },
+ { f: R`x^4 - 4x^3 + 4x^2`, fn: x => x**4 - 4*x**3 + 4*x**2, dom: [-0.7, 2.7],
+   roots: [R`\(x = 0\) and \(x = 2\)`, R`\(x = 0\), \(x = 1\) and \(x = 2\)`, R`\(x = 0\) and \(x = -2\)`, R`\(x = 2\) only`],
+   rootsWhy: R`\(f(0) = 0\). Factorise: \(x^2(x - 2)^2 = 0\), so \(x = 0\) or \(x = 2\) (it touches the axis at both).`,
+   lim: '++', limWhy: R`The highest power, \(x^4\), dominates.`,
+   fp: [R`\(4x^3 - 12x^2 + 8x\)`, R`\(4x^3 - 4x^2 + 4x\)`, R`\(4x^3 - 12x^2 + 8\)`, R`\(x^3 - 12x^2 + 8x\)`],
+   sp: [R`\((0, 0)\), \((1, 1)\) and \((2, 0)\)`, R`\((0, 0)\) and \((2, 0)\)`, R`\((1, 1)\) only`, R`\((0, 0)\), \((-1, 9)\) and \((2, 0)\)`],
+   spWhy: R`\(f'(x) = 4x(x - 1)(x - 2) = 0\), so \(x = 0, 1, 2\).`,
+   nat: [R`\((0, 0)\) and \((2, 0)\) are minima; \((1, 1)\) is a maximum`, R`\((0, 0)\) and \((2, 0)\) are maxima; \((1, 1)\) is a minimum`, R`all three are minima`, R`\((0, 0)\) is a minimum; \((1, 1)\) and \((2, 0)\) are maxima`],
+   natWhy: R`\(f''(x) = 12x^2 - 24x + 8\): \(f''(0) = f''(2) = 8 > 0\), \(f''(1) = -4 < 0\).`,
+   conc: [R`concave for \(0.42 < x < 1.58\), convex outside`, R`convex for \(0.42 < x < 1.58\), concave outside`, R`concave for \(0 < x < 2\), convex outside`, R`convex everywhere`],
+   concWhy: R`\(f''(x) = 0\) when \(3x^2 - 6x + 2 = 0\): \(x = 1 \pm \frac{1}{\sqrt{3}}\), i.e. \(0.42\) and \(1.58\).` },
+ { f: R`x^3 + 3x^2`, fn: x => x**3 + 3*x**2, dom: [-3.7, 1.4],
+   roots: [R`\(x = 0\) and \(x = -3\)`, R`\(x = 0\) and \(x = 3\)`, R`\(x = 0\) and \(x = -2\)`, R`\(x = -3\) only`],
+   rootsWhy: R`\(f(0) = 0\). Factorise: \(x^2(x + 3) = 0\), so \(x = 0\) or \(x = -3\).`,
+   lim: '+-', limWhy: R`The highest power, \(x^3\), dominates.`,
+   fp: [R`\(3x^2 + 6x\)`, R`\(3x^2 + 3x\)`, R`\(x^2 + 6x\)`, R`\(3x^2 + 6\)`],
+   sp: [R`\((0, 0)\) and \((-2, 4)\)`, R`\((0, 0)\) and \((2, 20)\)`, R`\((0, 0)\) and \((-3, 0)\)`, R`\((-2, 4)\) only`],
+   spWhy: R`\(f'(x) = 3x(x + 2) = 0\), so \(x = 0\) or \(-2\); \(f(-2) = -8 + 12 = 4\).`,
+   nat: [R`\((-2, 4)\) is a maximum; \((0, 0)\) is a minimum`, R`\((-2, 4)\) is a minimum; \((0, 0)\) is a maximum`, R`both are minima`, R`both are maxima`],
+   natWhy: R`\(f''(x) = 6x + 6\): \(f''(-2) = -6 < 0\) (max), \(f''(0) = 6 > 0\) (min).`,
+   conc: [R`concave for \(x < -1\), convex for \(x > -1\)`, R`convex for \(x < -1\), concave for \(x > -1\)`, R`concave for \(x < -2\), convex for \(x > -2\)`, R`convex everywhere`],
+   concWhy: R`\(f''(x) = 6x + 6 = 0\) at \(x = -1\).` },
+ { f: R`12x - x^3`, fn: x => 12*x - x**3, dom: [-4.3, 4.3],
+   roots: [R`\(x = 0\) and \(x = \pm 2\sqrt{3}\)`, R`\(x = 0\) and \(x = \pm 2\)`, R`\(x = \pm 2\sqrt{3}\) only`, R`\(x = 0\) and \(x = 12\)`],
+   rootsWhy: R`\(f(0) = 0\). Factorise: \(x(12 - x^2) = 0\), so \(x = 0\) or \(x = \pm\sqrt{12} = \pm 2\sqrt{3} \approx \pm 3.46\).`,
+   lim: '-+', limWhy: R`The highest power, \(-x^3\), dominates.`,
+   fp: [R`\(12 - 3x^2\)`, R`\(12x - 3x^2\)`, R`\(12 - x^2\)`, R`\(-3x^2\)`],
+   sp: [R`\((2, 16)\) and \((-2, -16)\)`, R`\((2, -16)\) and \((-2, 16)\)`, R`\((0, 0)\) and \((2, 16)\)`, R`\((2\sqrt{3}, 0)\) and \((-2\sqrt{3}, 0)\)`],
+   spWhy: R`\(f'(x) = 12 - 3x^2 = 0\), so \(x = \pm 2\); \(f(2) = 24 - 8 = 16\), \(f(-2) = -16\).`,
+   nat: [R`\((2, 16)\) is a maximum; \((-2, -16)\) is a minimum`, R`\((2, 16)\) is a minimum; \((-2, -16)\) is a maximum`, R`both are maxima`, R`both are minima`],
+   natWhy: R`\(f''(x) = -6x\): \(f''(2) = -12 < 0\) (max), \(f''(-2) = 12 > 0\) (min).`,
+   conc: [R`convex for \(x < 0\), concave for \(x > 0\)`, R`concave for \(x < 0\), convex for \(x > 0\)`, R`concave for \(-2 < x < 2\), convex outside`, R`concave everywhere`],
+   concWhy: R`\(f''(x) = -6x\): positive for \(x < 0\), negative for \(x > 0\).` }
+];
+
+// ---- Problem B: returns to scale ----
+const B_VARIANTS = [
+ { Y: R`2K^{0.4}L^{0.8}`, n: '1.2', rts: 'increasing',
+   YK: [R`0.8K^{-0.6}L^{0.8}`, R`0.8K^{0.4}L^{0.8}`, R`2K^{-0.6}L^{0.8}`, R`0.8K^{-0.6}L^{-0.2}`],
+   YL: [R`1.6K^{0.4}L^{-0.2}`, R`1.6K^{0.4}L^{0.8}`, R`0.8K^{0.4}L^{-0.2}`, R`1.6K^{-0.6}L^{-0.2}`],
+   eul: [R`1.2Y`, R`0.32Y`, R`Y`, R`2.4Y`], eulWhy: R`\(0.8K^{0.4}L^{0.8} + 1.6K^{0.4}L^{0.8} = 2.4K^{0.4}L^{0.8} = 1.2 \times 2K^{0.4}L^{0.8} = 1.2Y\).`,
+   dir: [R`\lambda^{1.2}Y`, R`\lambda^{0.32}Y`, R`\lambda Y`, R`2\lambda^{1.2}Y`],
+   dbl: [R`\(2^{1.2} \approx 2.30\)`, R`\(2.4\)`, R`\(2\)`, R`\(1.2\)`] },
+ { Y: R`K^{\frac{1}{4}}L^{\frac{1}{2}}`, n: R`\tfrac{3}{4}`, rts: 'decreasing',
+   YK: [R`\tfrac{1}{4}K^{-\frac{3}{4}}L^{\frac{1}{2}}`, R`\tfrac{1}{4}K^{\frac{1}{4}}L^{\frac{1}{2}}`, R`K^{-\frac{3}{4}}L^{\frac{1}{2}}`, R`\tfrac{1}{4}K^{-\frac{3}{4}}L^{-\frac{1}{2}}`],
+   YL: [R`\tfrac{1}{2}K^{\frac{1}{4}}L^{-\frac{1}{2}}`, R`\tfrac{1}{2}K^{\frac{1}{4}}L^{\frac{1}{2}}`, R`\tfrac{1}{4}K^{\frac{1}{4}}L^{-\frac{1}{2}}`, R`\tfrac{1}{2}K^{-\frac{3}{4}}L^{-\frac{1}{2}}`],
+   eul: [R`\tfrac{3}{4}Y`, R`\tfrac{1}{8}Y`, R`Y`, R`\tfrac{5}{4}Y`], eulWhy: R`\(\tfrac{1}{4}K^{\frac{1}{4}}L^{\frac{1}{2}} + \tfrac{1}{2}K^{\frac{1}{4}}L^{\frac{1}{2}} = \tfrac{3}{4}Y\).`,
+   dir: [R`\lambda^{\frac{3}{4}}Y`, R`\lambda^{\frac{1}{8}}Y`, R`\lambda Y`, R`\lambda^{\frac{3}{2}}Y`],
+   dbl: [R`\(2^{0.75} \approx 1.68\)`, R`\(1.5\)`, R`\(2\)`, R`\(0.75\)`] },
+ { Y: R`K^{0.3}L^{0.9}`, n: '1.2', rts: 'increasing',
+   YK: [R`0.3K^{-0.7}L^{0.9}`, R`0.3K^{0.3}L^{0.9}`, R`K^{-0.7}L^{0.9}`, R`0.3K^{-0.7}L^{-0.1}`],
+   YL: [R`0.9K^{0.3}L^{-0.1}`, R`0.9K^{0.3}L^{0.9}`, R`0.3K^{0.3}L^{-0.1}`, R`0.9K^{-0.7}L^{-0.1}`],
+   eul: [R`1.2Y`, R`0.27Y`, R`Y`, R`0.6Y`], eulWhy: R`\(0.3K^{0.3}L^{0.9} + 0.9K^{0.3}L^{0.9} = 1.2Y\).`,
+   dir: [R`\lambda^{1.2}Y`, R`\lambda^{0.27}Y`, R`\lambda Y`, R`\lambda^{0.6}Y`],
+   dbl: [R`\(2^{1.2} \approx 2.30\)`, R`\(2.4\)`, R`\(2\)`, R`\(1.2\)`] },
+ { Y: R`3K^{0.5}L^{0.5}`, n: '1', rts: 'constant',
+   YK: [R`1.5K^{-0.5}L^{0.5}`, R`1.5K^{0.5}L^{0.5}`, R`3K^{-0.5}L^{0.5}`, R`0.5K^{-0.5}L^{0.5}`],
+   YL: [R`1.5K^{0.5}L^{-0.5}`, R`1.5K^{0.5}L^{0.5}`, R`0.5K^{0.5}L^{-0.5}`, R`3K^{0.5}L^{-0.5}`],
+   eul: [R`Y`, R`0.25Y`, R`3Y`, R`2Y`], eulWhy: R`\(1.5K^{0.5}L^{0.5} + 1.5K^{0.5}L^{0.5} = 3K^{0.5}L^{0.5} = 1 \times Y\).`,
+   dir: [R`\lambda Y`, R`\lambda^{0.25}Y`, R`3\lambda Y`, R`\lambda^{2}Y`],
+   dbl: [R`\(2\): it exactly doubles`, R`\(4\)`, R`\(2.83\)`, R`\(1\)`] },
+ { Y: R`5K^{0.2}L^{0.6}`, n: '0.8', rts: 'decreasing',
+   YK: [R`K^{-0.8}L^{0.6}`, R`K^{0.2}L^{0.6}`, R`5K^{-0.8}L^{0.6}`, R`K^{-0.8}L^{-0.4}`],
+   YL: [R`3K^{0.2}L^{-0.4}`, R`3K^{0.2}L^{0.6}`, R`0.6K^{0.2}L^{-0.4}`, R`3K^{-0.8}L^{-0.4}`],
+   eul: [R`0.8Y`, R`0.12Y`, R`Y`, R`4Y`], eulWhy: R`\(K^{0.2}L^{0.6} + 3K^{0.2}L^{0.6} = 4K^{0.2}L^{0.6} = 0.8 \times 5K^{0.2}L^{0.6} = 0.8Y\).`,
+   dir: [R`\lambda^{0.8}Y`, R`\lambda^{0.12}Y`, R`\lambda Y`, R`5\lambda^{0.8}Y`],
+   dbl: [R`\(2^{0.8} \approx 1.74\)`, R`\(1.6\)`, R`\(2\)`, R`\(0.8\)`] },
+ { Y: R`K^{0.6}L^{0.6}`, n: '1.2', rts: 'increasing',
+   YK: [R`0.6K^{-0.4}L^{0.6}`, R`0.6K^{0.6}L^{0.6}`, R`K^{-0.4}L^{0.6}`, R`0.6K^{-0.4}L^{-0.4}`],
+   YL: [R`0.6K^{0.6}L^{-0.4}`, R`0.6K^{0.6}L^{0.6}`, R`K^{0.6}L^{-0.4}`, R`0.6K^{-0.4}L^{-0.4}`],
+   eul: [R`1.2Y`, R`0.36Y`, R`Y`, R`0.6Y`], eulWhy: R`\(0.6K^{0.6}L^{0.6} + 0.6K^{0.6}L^{0.6} = 1.2Y\).`,
+   dir: [R`\lambda^{1.2}Y`, R`\lambda^{0.36}Y`, R`\lambda Y`, R`\lambda^{0.6}Y`],
+   dbl: [R`\(2^{1.2} \approx 2.30\)`, R`\(2.4\)`, R`\(2\)`, R`\(1.2\)`] }
+];
+
+// ---- Problem C: classifying a stationary point of g(x, y) ----
+const C_VARIANTS = [
+ { g: R`e^{xy} + x^2 - y^2 - 4x - 2y`, pt: '(2, 0)',
+   gx: [R`ye^{xy} + 2x - 4`, R`e^{xy} + 2x - 4`, R`xe^{xy} + 2x - 4`, R`ye^{xy} + 2x`],
+   gy: [R`xe^{xy} - 2y - 2`, R`e^{xy} - 2y - 2`, R`ye^{xy} - 2y - 2`, R`xe^{xy} - 2y`],
+   chk: R`\(g_x = 0 + 4 - 4 = 0\) and \(g_y = 2 - 0 - 2 = 0\)`,
+   gxy: [R`(1 + xy)e^{xy}`, R`xye^{xy}`, R`e^{xy}`, R`y^2e^{xy}`],
+   sec: R`\(g_{xx} = y^2e^{xy} + 2\), \(g_{yy} = x^2e^{xy} - 2\)`,
+   val: [R`\(g_{xx} = 2,\ g_{yy} = 2,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = -2,\ g_{xy} = 1\)`, R`\(g_{xx} = 0,\ g_{yy} = 2,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = 2,\ g_{xy} = 0\)`],
+   D: ['3', '5', '4', '-3'], nat: 'minimum', natWhy: R`\(D = 2 \times 2 - 1^2 = 3 > 0\) and \(g_{xx}, g_{yy} > 0\).` },
+ { g: R`4x - x^2 - y^2 + 2y - e^{xy}`, pt: '(2, 0)',
+   gx: [R`4 - 2x - ye^{xy}`, R`4 - 2x - e^{xy}`, R`4 - 2x - xe^{xy}`, R`4 - 2x + ye^{xy}`],
+   gy: [R`2 - 2y - xe^{xy}`, R`2 - 2y - e^{xy}`, R`2 - 2y - ye^{xy}`, R`-2y - xe^{xy}`],
+   chk: R`\(g_x = 4 - 4 - 0 = 0\) and \(g_y = 2 - 0 - 2 = 0\)`,
+   gxy: [R`-(1 + xy)e^{xy}`, R`-xye^{xy}`, R`(1 + xy)e^{xy}`, R`-e^{xy}`],
+   sec: R`\(g_{xx} = -2 - y^2e^{xy}\), \(g_{yy} = -2 - x^2e^{xy}\)`,
+   val: [R`\(g_{xx} = -2,\ g_{yy} = -6,\ g_{xy} = -1\)`, R`\(g_{xx} = -2,\ g_{yy} = -2,\ g_{xy} = -1\)`, R`\(g_{xx} = -2,\ g_{yy} = -6,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = 6,\ g_{xy} = 1\)`],
+   D: ['11', '13', '12', '-11'], nat: 'maximum', natWhy: R`\(D = (-2)(-6) - (-1)^2 = 11 > 0\) and \(g_{xx}, g_{yy} < 0\).` },
+ { g: R`e^{xy} + x^2 - y^2 - 2x - y`, pt: '(1, 0)',
+   gx: [R`ye^{xy} + 2x - 2`, R`e^{xy} + 2x - 2`, R`xe^{xy} + 2x - 2`, R`ye^{xy} + 2x`],
+   gy: [R`xe^{xy} - 2y - 1`, R`e^{xy} - 2y - 1`, R`ye^{xy} - 2y - 1`, R`xe^{xy} - 2y`],
+   chk: R`\(g_x = 0 + 2 - 2 = 0\) and \(g_y = 1 - 0 - 1 = 0\)`,
+   gxy: [R`(1 + xy)e^{xy}`, R`xye^{xy}`, R`e^{xy}`, R`y^2e^{xy}`],
+   sec: R`\(g_{xx} = y^2e^{xy} + 2\), \(g_{yy} = x^2e^{xy} - 2\)`,
+   val: [R`\(g_{xx} = 2,\ g_{yy} = -1,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = 1,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = -2,\ g_{xy} = 1\)`, R`\(g_{xx} = 0,\ g_{yy} = -1,\ g_{xy} = 1\)`],
+   D: ['-3', '-1', '3', '-2'], nat: 'saddle point', natWhy: R`\(D = 2 \times (-1) - 1^2 = -3 < 0\).` },
+ { g: R`e^{2xy} + 2x^2 + y^2 - 8x - 4y`, pt: '(2, 0)',
+   gx: [R`2ye^{2xy} + 4x - 8`, R`e^{2xy} + 4x - 8`, R`2xe^{2xy} + 4x - 8`, R`ye^{2xy} + 4x - 8`],
+   gy: [R`2xe^{2xy} + 2y - 4`, R`e^{2xy} + 2y - 4`, R`2ye^{2xy} + 2y - 4`, R`xe^{2xy} + 2y - 4`],
+   chk: R`\(g_x = 0 + 8 - 8 = 0\) and \(g_y = 4 + 0 - 4 = 0\)`,
+   gxy: [R`(2 + 4xy)e^{2xy}`, R`4xye^{2xy}`, R`2e^{2xy}`, R`(1 + xy)e^{2xy}`],
+   sec: R`\(g_{xx} = 4y^2e^{2xy} + 4\), \(g_{yy} = 4x^2e^{2xy} + 2\)`,
+   val: [R`\(g_{xx} = 4,\ g_{yy} = 18,\ g_{xy} = 2\)`, R`\(g_{xx} = 4,\ g_{yy} = 2,\ g_{xy} = 2\)`, R`\(g_{xx} = 4,\ g_{yy} = 18,\ g_{xy} = 0\)`, R`\(g_{xx} = 2,\ g_{yy} = 18,\ g_{xy} = 2\)`],
+   D: ['68', '76', '70', '64'], nat: 'minimum', natWhy: R`\(D = 4 \times 18 - 2^2 = 68 > 0\) and \(g_{xx}, g_{yy} > 0\).` },
+ { g: R`e^{xy} - x^2 + y^2 + 2x - y`, pt: '(1, 0)',
+   gx: [R`ye^{xy} - 2x + 2`, R`e^{xy} - 2x + 2`, R`xe^{xy} - 2x + 2`, R`ye^{xy} - 2x`],
+   gy: [R`xe^{xy} + 2y - 1`, R`e^{xy} + 2y - 1`, R`ye^{xy} + 2y - 1`, R`xe^{xy} + 2y`],
+   chk: R`\(g_x = 0 - 2 + 2 = 0\) and \(g_y = 1 + 0 - 1 = 0\)`,
+   gxy: [R`(1 + xy)e^{xy}`, R`xye^{xy}`, R`e^{xy}`, R`y^2e^{xy}`],
+   sec: R`\(g_{xx} = y^2e^{xy} - 2\), \(g_{yy} = x^2e^{xy} + 2\)`,
+   val: [R`\(g_{xx} = -2,\ g_{yy} = 3,\ g_{xy} = 1\)`, R`\(g_{xx} = -2,\ g_{yy} = 1,\ g_{xy} = 1\)`, R`\(g_{xx} = 2,\ g_{yy} = 3,\ g_{xy} = 1\)`, R`\(g_{xx} = -2,\ g_{yy} = 3,\ g_{xy} = 0\)`],
+   D: ['-7', '-5', '5', '-6'], nat: 'saddle point', natWhy: R`\(D = (-2) \times 3 - 1^2 = -7 < 0\).` }
+];
+
+// ---- Problem D: constrained optimisation (cost minimisation + utility) ----
+const D_COST = [
+ { F: R`K^{\frac{1}{5}}L^{\frac{4}{5}}`, r: 16, w: 2, y: 100,
+   foc: [R`16 = \tfrac{1}{5}\lambda K^{-\frac{4}{5}}L^{\frac{4}{5}}`, R`16 = \tfrac{1}{5}\lambda K^{\frac{1}{5}}L^{\frac{4}{5}}`, R`16\lambda = \tfrac{1}{5}K^{-\frac{4}{5}}L^{\frac{4}{5}}`, R`16 = \tfrac{4}{5}\lambda K^{\frac{1}{5}}L^{-\frac{1}{5}}`],
+   ratio: [R`L = 32K`, R`K = 32L`, R`L = 8K`, R`L = 2K`],
+   ratioWhy: R`\(\frac{16}{2} = \frac{\frac{1}{5}K^{-\frac{4}{5}}L^{\frac{4}{5}}}{\frac{4}{5}K^{\frac{1}{5}}L^{-\frac{1}{5}}} = \frac{L}{4K}\), so \(L = 32K\).`,
+   KL: [R`K = 6.25,\ L = 200`, R`K = 200,\ L = 6.25`, R`K = 3.125,\ L = 100`, R`K = 12.5,\ L = 400`],
+   KLWhy: R`\(K^{\frac{1}{5}}(32K)^{\frac{4}{5}} = 16K = 100\), so \(K = 6.25\) and \(L = 200\).`,
+   cost: ['500', '400', '600', '1000'], costWhy: R`\(16 \times 6.25 + 2 \times 200 = 100 + 400 = 500\).` },
+ { F: R`K^{\frac{1}{2}}L^{\frac{1}{2}}`, r: 4, w: 1, y: 40,
+   foc: [R`4 = \tfrac{1}{2}\lambda K^{-\frac{1}{2}}L^{\frac{1}{2}}`, R`4 = \tfrac{1}{2}\lambda K^{\frac{1}{2}}L^{\frac{1}{2}}`, R`4\lambda = \tfrac{1}{2}K^{-\frac{1}{2}}L^{\frac{1}{2}}`, R`4 = \tfrac{1}{2}\lambda K^{\frac{1}{2}}L^{-\frac{1}{2}}`],
+   ratio: [R`L = 4K`, R`K = 4L`, R`L = K`, R`L = 16K`],
+   ratioWhy: R`\(\frac{4}{1} = \frac{\frac{1}{2}K^{-\frac{1}{2}}L^{\frac{1}{2}}}{\frac{1}{2}K^{\frac{1}{2}}L^{-\frac{1}{2}}} = \frac{L}{K}\), so \(L = 4K\).`,
+   KL: [R`K = 20,\ L = 80`, R`K = 80,\ L = 20`, R`K = 10,\ L = 40`, R`K = 40,\ L = 160`],
+   KLWhy: R`\(K^{\frac{1}{2}}(4K)^{\frac{1}{2}} = 2K = 40\), so \(K = 20\) and \(L = 80\).`,
+   cost: ['160', '340', '100', '200'], costWhy: R`\(4 \times 20 + 1 \times 80 = 160\).` },
+ { F: R`2K^{\frac{1}{4}}L^{\frac{3}{4}}`, r: 16, w: 3, y: 160,
+   foc: [R`16 = \tfrac{1}{2}\lambda K^{-\frac{3}{4}}L^{\frac{3}{4}}`, R`16 = \tfrac{1}{4}\lambda K^{-\frac{3}{4}}L^{\frac{3}{4}}`, R`16 = \tfrac{1}{2}\lambda K^{\frac{1}{4}}L^{\frac{3}{4}}`, R`16\lambda = \tfrac{1}{2}K^{-\frac{3}{4}}L^{\frac{3}{4}}`],
+   ratio: [R`L = 16K`, R`K = 16L`, R`L = \tfrac{16}{9}K`, R`L = 3K`],
+   ratioWhy: R`\(\frac{16}{3} = \frac{\frac{1}{2}K^{-\frac{3}{4}}L^{\frac{3}{4}}}{\frac{3}{2}K^{\frac{1}{4}}L^{-\frac{1}{4}}} = \frac{L}{3K}\), so \(L = 16K\).`,
+   KL: [R`K = 10,\ L = 160`, R`K = 160,\ L = 10`, R`K = 20,\ L = 320`, R`K = 5,\ L = 80`],
+   KLWhy: R`\(2K^{\frac{1}{4}}(16K)^{\frac{3}{4}} = 2 \times 8K = 16K = 160\), so \(K = 10\), \(L = 160\).`,
+   cost: ['640', '320', '1280', '480'], costWhy: R`\(16 \times 10 + 3 \times 160 = 160 + 480 = 640\).` },
+ { F: R`K^{\frac{1}{2}}L^{\frac{1}{2}}`, r: 9, w: 4, y: 60,
+   foc: [R`9 = \tfrac{1}{2}\lambda K^{-\frac{1}{2}}L^{\frac{1}{2}}`, R`9 = \tfrac{1}{2}\lambda K^{\frac{1}{2}}L^{\frac{1}{2}}`, R`9\lambda = \tfrac{1}{2}K^{-\frac{1}{2}}L^{\frac{1}{2}}`, R`9 = \tfrac{1}{2}\lambda K^{\frac{1}{2}}L^{-\frac{1}{2}}`],
+   ratio: [R`L = \tfrac{9}{4}K`, R`K = \tfrac{9}{4}L`, R`L = \tfrac{4}{9}K`, R`L = 36K`],
+   ratioWhy: R`\(\frac{9}{4} = \frac{L}{K}\), so \(L = \frac{9}{4}K\).`,
+   KL: [R`K = 40,\ L = 90`, R`K = 90,\ L = 40`, R`K = 20,\ L = 45`, R`K = 60,\ L = 60`],
+   KLWhy: R`\(K^{\frac{1}{2}}\left(\tfrac{9}{4}K\right)^{\frac{1}{2}} = \tfrac{3}{2}K = 60\), so \(K = 40\), \(L = 90\).`,
+   cost: ['720', '970', '360', '1440'], costWhy: R`\(9 \times 40 + 4 \times 90 = 360 + 360 = 720\).` },
+ { F: R`K^{\frac{1}{3}}L^{\frac{2}{3}}`, r: 20, w: 5, y: 40,
+   foc: [R`20 = \tfrac{1}{3}\lambda K^{-\frac{2}{3}}L^{\frac{2}{3}}`, R`20 = \tfrac{1}{3}\lambda K^{\frac{1}{3}}L^{\frac{2}{3}}`, R`20 = \tfrac{2}{3}\lambda K^{\frac{1}{3}}L^{-\frac{1}{3}}`, R`20\lambda = \tfrac{1}{3}K^{-\frac{2}{3}}L^{\frac{2}{3}}`],
+   ratio: [R`L = 8K`, R`K = 8L`, R`L = 2K`, R`L = 4K`],
+   ratioWhy: R`\(\frac{20}{5} = \frac{\frac{1}{3}K^{-\frac{2}{3}}L^{\frac{2}{3}}}{\frac{2}{3}K^{\frac{1}{3}}L^{-\frac{1}{3}}} = \frac{L}{2K}\), so \(L = 8K\).`,
+   KL: [R`K = 10,\ L = 80`, R`K = 80,\ L = 10`, R`K = 20,\ L = 40`, R`K = 5,\ L = 40`],
+   KLWhy: R`\(K^{\frac{1}{3}}(8K)^{\frac{2}{3}} = 4K = 40\), so \(K = 10\), \(L = 80\).`,
+   cost: ['600', '1650', '300', '1200'], costWhy: R`\(20 \times 10 + 5 \times 80 = 200 + 400 = 600\).` }
+];
+const D_UTIL = [
+ { u: R`x^{\frac{1}{2}}y^{\frac{1}{4}}`, px: 2, py: 1, m: 60,
+   logs: [R`\tfrac{1}{2}\ln x + \tfrac{1}{4}\ln y`, R`\tfrac{1}{8}\ln(xy)`, R`\ln\left(\tfrac{1}{2}x\right) + \ln\left(\tfrac{1}{4}y\right)`, R`\tfrac{1}{2}\ln x \times \tfrac{1}{4}\ln y`],
+   foc: [R`\dfrac{1}{2x} = 2\lambda,\ \ \dfrac{1}{4y} = \lambda`, R`\dfrac{1}{2x} = \lambda,\ \ \dfrac{1}{4y} = 2\lambda`, R`\tfrac{1}{2}\ln x = 2\lambda,\ \ \tfrac{1}{4}\ln y = \lambda`, R`\dfrac{x}{2} = 2\lambda,\ \ \dfrac{y}{4} = \lambda`],
+   ratio: [R`y = x`, R`y = 2x`, R`x = 4y`, R`y = \tfrac{1}{2}x`], ratioWhy: R`Divide: \(\frac{1/(2x)}{1/(4y)} = 2\), so \(\frac{2y}{x} = 2\) and \(y = x\).`,
+   xy: [R`x = 20,\ y = 20`, R`x = 10,\ y = 40`, R`x = 15,\ y = 30`, R`x = 30,\ y = 0`], xyWhy: R`Budget: \(2x + x = 60\), so \(x = y = 20\).` },
+ { u: R`x^{\frac{1}{3}}y^{\frac{2}{3}}`, px: 2, py: 4, m: 90,
+   logs: [R`\tfrac{1}{3}\ln x + \tfrac{2}{3}\ln y`, R`\tfrac{2}{9}\ln(xy)`, R`\ln\left(\tfrac{1}{3}x\right) + \ln\left(\tfrac{2}{3}y\right)`, R`\tfrac{1}{3}\ln x \times \tfrac{2}{3}\ln y`],
+   foc: [R`\dfrac{1}{3x} = 2\lambda,\ \ \dfrac{2}{3y} = 4\lambda`, R`\dfrac{1}{3x} = 4\lambda,\ \ \dfrac{2}{3y} = 2\lambda`, R`\tfrac{1}{3}\ln x = 2\lambda,\ \ \tfrac{2}{3}\ln y = 4\lambda`, R`\dfrac{x}{3} = 2\lambda,\ \ \dfrac{2y}{3} = 4\lambda`],
+   ratio: [R`y = x`, R`y = 4x`, R`y = \tfrac{1}{2}x`, R`x = 2y`], ratioWhy: R`Divide: \(\frac{1/(3x)}{2/(3y)} = \frac{2}{4}\), so \(\frac{y}{2x} = \frac{1}{2}\) and \(y = x\).`,
+   xy: [R`x = 15,\ y = 15`, R`x = 5,\ y = 20`, R`x = 30,\ y = 7.5`, R`x = 45,\ y = 0`], xyWhy: R`Budget: \(2x + 4x = 90\), so \(x = y = 15\).` },
+ { u: R`x^{0.6}y^{0.4}`, px: 3, py: 2, m: 50,
+   logs: [R`0.6\ln x + 0.4\ln y`, R`0.24\ln(xy)`, R`\ln(0.6x) + \ln(0.4y)`, R`0.6\ln x \times 0.4\ln y`],
+   foc: [R`\dfrac{0.6}{x} = 3\lambda,\ \ \dfrac{0.4}{y} = 2\lambda`, R`\dfrac{0.6}{x} = 2\lambda,\ \ \dfrac{0.4}{y} = 3\lambda`, R`0.6\ln x = 3\lambda,\ \ 0.4\ln y = 2\lambda`, R`0.6x = 3\lambda,\ \ 0.4y = 2\lambda`],
+   ratio: [R`y = x`, R`y = 1.5x`, R`y = \tfrac{2}{3}x`, R`x = 2.25y`], ratioWhy: R`Divide: \(\frac{0.6/x}{0.4/y} = \frac{3}{2}\), so \(\frac{1.5y}{x} = 1.5\) and \(y = x\).`,
+   xy: [R`x = 10,\ y = 10`, R`x = 6,\ y = 16`, R`x = 12,\ y = 7`, R`x = 4,\ y = 19`], xyWhy: R`Budget: \(3x + 2x = 50\), so \(x = y = 10\).` },
+ { u: R`x^{\frac{1}{3}}y^{\frac{2}{3}}`, px: 2, py: 5, m: 120,
+   logs: [R`\tfrac{1}{3}\ln x + \tfrac{2}{3}\ln y`, R`\tfrac{2}{9}\ln(xy)`, R`\ln\left(\tfrac{1}{3}x\right) + \ln\left(\tfrac{2}{3}y\right)`, R`\tfrac{1}{3}\ln x \times \tfrac{2}{3}\ln y`],
+   foc: [R`\dfrac{1}{3x} = 2\lambda,\ \ \dfrac{2}{3y} = 5\lambda`, R`\dfrac{1}{3x} = 5\lambda,\ \ \dfrac{2}{3y} = 2\lambda`, R`\tfrac{1}{3}\ln x = 2\lambda,\ \ \tfrac{2}{3}\ln y = 5\lambda`, R`\dfrac{x}{3} = 2\lambda,\ \ \dfrac{2y}{3} = 5\lambda`],
+   ratio: [R`y = \tfrac{4}{5}x`, R`y = \tfrac{5}{4}x`, R`y = x`, R`y = \tfrac{2}{5}x`], ratioWhy: R`Divide: \(\frac{1/(3x)}{2/(3y)} = \frac{2}{5}\), so \(\frac{y}{2x} = \frac{2}{5}\) and \(y = \frac{4}{5}x\).`,
+   xy: [R`x = 20,\ y = 16`, R`x = 16,\ y = 20`, R`x = 40,\ y = 8`, R`x = 10,\ y = 20`], xyWhy: R`Budget: \(2x + 5 \times \frac{4}{5}x = 6x = 120\), so \(x = 20\), \(y = 16\).` },
+ { u: R`x^{\frac{1}{2}}y^{\frac{1}{2}}`, px: 3, py: 2, m: 60,
+   logs: [R`\tfrac{1}{2}\ln x + \tfrac{1}{2}\ln y`, R`\tfrac{1}{4}\ln(xy)`, R`\ln\left(\tfrac{1}{2}x\right) + \ln\left(\tfrac{1}{2}y\right)`, R`\tfrac{1}{2}\ln x \times \tfrac{1}{2}\ln y`],
+   foc: [R`\dfrac{1}{2x} = 3\lambda,\ \ \dfrac{1}{2y} = 2\lambda`, R`\dfrac{1}{2x} = 2\lambda,\ \ \dfrac{1}{2y} = 3\lambda`, R`\tfrac{1}{2}\ln x = 3\lambda,\ \ \tfrac{1}{2}\ln y = 2\lambda`, R`\dfrac{x}{2} = 3\lambda,\ \ \dfrac{y}{2} = 2\lambda`],
+   ratio: [R`2y = 3x`, R`3y = 2x`, R`y = x`, R`6xy = 1`], ratioWhy: R`Divide: \(\frac{1/(2x)}{1/(2y)} = \frac{3}{2}\), so \(\frac{y}{x} = \frac{3}{2}\).`,
+   xy: [R`x = 10,\ y = 15`, R`x = 15,\ y = 10`, R`x = 12,\ y = 12`, R`x = 20,\ y = 0`], xyWhy: R`Budget: \(3x + 3x = 60\), so \(x = 10\), \(y = 15\).` }
+];
+</script>
+
+<script>
+// =====================================================================================
+// APP
+// =====================================================================================
+const PROBLEMS = {
+  A: { name: 'Sketch a function', lecture: 'Lectures 2 and 3', marks: 20,
+       blurb: 'Intercepts, limits, stationary points, their nature, concavity, and the sketch.' },
+  B: { name: 'Returns to scale', lecture: 'Lectures 1 and 4', marks: 10,
+       blurb: "Euler's theorem, the direct check, the degree, and returns to scale." },
+  C: { name: 'Maxima and minima of f(x, y)', lecture: 'Lectures 4 and 5', marks: 15,
+       blurb: 'State the conditions, show a point is stationary, find the second-order partials, classify.' },
+  D: { name: 'Constrained optimisation', lecture: 'Lecture 6', marks: 20,
+       blurb: 'Cost minimisation with a Lagrangian, then utility maximisation using logs.' }
+};
+const WEEK_TOPICS = { 1: 'Lecture 1', 2: 'Lecture 2', 3: 'Lecture 3', 4: 'Lectures 4 and 5', 5: 'Lecture 6' };
+
+// ---------- small helpers ----------
+const $app = () => document.getElementById('app');
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function m(s) { return '\\(' + s + '\\)'; }              // wrap a bare TeX string as inline maths
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function typeset(el) {
+  if (window.MathJax && MathJax.typesetPromise) { MathJax.typesetClear && MathJax.typesetClear([el]); return MathJax.typesetPromise([el]).catch(() => {}); }
+  setTimeout(() => typeset(el), 150);
+}
+function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem('qm-' + k)); localStorage.setItem('qm-' + k, JSON.stringify(v)); } catch (e) { return null; } }
+function setTitle(t, showBack) {
+  document.getElementById('title').textContent = t;
+  document.getElementById('back').classList.toggle('hidden', !showBack);
+}
+function render(html) { const el = $app(); el.innerHTML = html; window.scrollTo(0, 0); typeset(el); }
+function go(h) { location.hash = h; }
+function goBack() { if (history.length > 1) history.back(); else go('#/'); }
+
+// ---------- parse the skill bank ----------
+function parseBank() {
+  const lines = document.getElementById('skill-bank').textContent.split('\n');
+  const skills = []; let s = null, q = null;
+  for (let raw of lines) {
+    const line = raw.trim();
+    if (!line || (line.startsWith('#') && !line.startsWith('##'))) continue;
+    if (line.startsWith('##')) {
+      const p = line.slice(2).split('|').map(x => x.trim());
+      s = { id: p[0], name: p[1], lecture: p[2] || '', weeks: (p[3] || '').split(',').map(x => +x.trim()).filter(Boolean), facts: [], qs: [] };
+      skills.push(s); q = null;
+    } else if (!s) continue;
+    else if (line.startsWith('K:')) s.facts.push(line.slice(2).trim());
+    else if (line.startsWith('Q:')) { q = { q: line.slice(2).trim(), opts: [], why: '' }; s.qs.push(q); }
+    else if (q && line.startsWith('+')) q.opts.push({ t: line.slice(1).trim(), ok: true });
+    else if (q && line.startsWith('-')) q.opts.push({ t: line.slice(1).trim(), ok: false });
+    else if (q && line.startsWith('W:')) q.why = line.slice(2).trim();
+  }
+  return skills;
+}
+const SKILLS = parseBank();
+const skillById = id => SKILLS.find(s => s.id === id);
+
+// ---------- the quiz engine (used by skills, weekly tests and exam questions) ----------
+// item = { q, opts:[{t, ok, svg?}], why, part?, marks?, grid? }
+function runQuiz(cfg) {
+  const st = { i: 0, score: 0, marks: 0, items: cfg.items.map(it => Object.assign({}, it, { opts: it.keep ? it.opts : shuffle(it.opts) })) };
+  const total = st.items.length;
+  function show() {
+    const it = st.items[st.i];
+    const head = `<div class="qhead"><span>${it.part ? `<span class="part">${esc(it.part)}</span>` : ''} Question ${st.i + 1} of ${total}</span>
+      <span>${it.marks ? it.marks + (it.marks > 1 ? ' marks' : ' mark') : ''}</span></div>
+      <div class="progress"><div style="width:${100 * st.i / total}%"></div></div>`;
+    const opts = it.opts.map((o, k) => `<button class="opt" data-k="${k}">${o.svg ? o.t : esc(o.t)}</button>`).join('');
+    render(`${cfg.header || ''}<div class="qcard">${head}<div class="qtext">${it.html ? it.q : esc(it.q)}</div>
+      <div class="${it.grid ? 'optgrid' : ''}">${opts}</div><div id="fb"></div></div>`);
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(+b.dataset.k));
+  }
+  function answer(k) {
+    const it = st.items[st.i], ok = it.opts[k].ok;
+    document.querySelectorAll('.opt').forEach((b, j) => {
+      b.disabled = true;
+      if (it.opts[j].ok) b.classList.add('correct'); else if (j === k) b.classList.add('wrong');
     });
-  });
-});
-
-// ================================================================
-// UTILITY FUNCTIONS
-// ================================================================
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.classList.add('visible');
-}
-
-function hideError(id) {
-  document.getElementById(id).classList.remove('visible');
-}
-
-function round(val, dp = 4) {
-  return Math.round(val * Math.pow(10, dp)) / Math.pow(10, dp);
-}
-
-function fmtNum(val, dp = 2) {
-  if (Math.abs(val) < 1e-10) return '0';
-  const r = round(val, dp);
-  return Number.isInteger(r) ? r.toString() : r.toFixed(dp).replace(/\.?0+$/, '');
-}
-
-function retypeset(el) {
-  if (window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetPromise([el]).catch(() => {});
+    if (ok) { st.score++; st.marks += it.marks || 0; }
+    const last = st.i === total - 1;
+    const fb = document.getElementById('fb');
+    fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'bad'}"><b>${ok ? 'Correct.' : 'Not quite.'}</b>${esc(it.why || '')}</div>
+      <button class="btn wide" id="next">${last ? 'See results' : 'Next'}</button>`;
+    typeset(fb);
+    document.getElementById('next').onclick = () => { if (last) cfg.done(st); else { st.i++; show(); } };
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+  show();
 }
 
-// Safe evaluation using math.js
-function safeEval(expr, scope) {
-  try {
-    return math.evaluate(expr, scope);
-  } catch { return NaN; }
+// ---------- views ----------
+function viewHome() {
+  setTitle('QM Maths Practice', false);
+  const tiles = Object.entries(PROBLEMS).map(([k, p]) => `
+    <button class="tile" onclick="go('#/exam/${k}')"><span class="badge">${bestBadge('exam-' + k, p.marks)}</span>
+      <div class="t"><span class="letter">${k}</span>${esc(p.name)}</div><div class="s">${esc(p.blurb)}</div></button>`).join('');
+  render(`<h1>The four problems you'll solve</h1>
+    <p class="muted">The maths exam is made of these four types of question. Practise each one step by step, with a new version every time.</p>
+    ${tiles}
+    <h2>Build the skills</h2>
+    <button class="tile" onclick="go('#/skills')"><div class="t">Key skills</div><div class="s">Short multiple-choice drills on each tool, in the order we teach them.</div></button>
+    <button class="tile" onclick="go('#/weekly')"><div class="t">Weekly test practice</div><div class="s">Five questions in the style of the in-class tests.</div></button>
+    <p class="muted" style="margin-top:1rem">Tip: for the exam questions, try each part on paper first, then tap your answer.
+    Your progress is saved on this phone only.</p>`);
+}
+function bestBadge(key, outOf) { const b = store('best-' + key); return b === null || b === undefined ? '' : `Best ${b}/${outOf}`; }
+
+function viewSkills() {
+  setTitle('Key skills', true);
+  render(`<h1>Key skills</h1><p class="muted">Each drill picks up to 10 questions at random.</p>` +
+    SKILLS.map(s => `<button class="tile" onclick="go('#/skill/${s.id}')"><span class="badge">${bestBadge('skill-' + s.id, Math.min(10, s.qs.length))}</span>
+      <div class="t">${esc(s.name)}</div><div class="s">${esc(s.lecture)} &middot; ${s.qs.length} questions</div></button>`).join(''));
 }
 
-// Example setters
-function setGraphExample(func, xmin, xmax) {
-  document.getElementById('graph-func').value = func;
-  document.getElementById('graph-xmin').value = xmin;
-  document.getElementById('graph-xmax').value = xmax;
+function viewSkill(id) {
+  const s = skillById(id); if (!s) return go('#/skills');
+  setTitle(s.name, true);
+  render(`<h1>${esc(s.name)}</h1><p class="muted">${esc(s.lecture)}</p>
+    <div class="facts"><b>Key facts</b><ul>${s.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul></div>
+    <button class="btn wide" id="start">Start (${Math.min(10, s.qs.length)} questions)</button>`);
+  document.getElementById('start').onclick = () => startSkill(s);
+}
+function startSkill(s) {
+  const n = Math.min(10, s.qs.length);
+  runQuiz({ items: shuffle(s.qs).slice(0, n),
+    done: st => results(`${s.name}`, st.score, n, 'skill-' + s.id, () => startSkill(s), '#/skills') });
+}
+function results(name, score, outOf, key, again, backHash, extra) {
+  const prev = store('best-' + key);
+  if (prev === null || prev === undefined || score > prev) store('best-' + key, score);
+  const msg = score === outOf ? 'Perfect.' : score >= 0.7 * outOf ? 'Good work.' : 'Have another go: the questions change each time.';
+  render(`<h1>${esc(name)}</h1><div class="card" style="text-align:center"><div class="big">${score} / ${outOf}</div><p>${msg}</p></div>
+    ${extra || ''}
+    <div class="row"><button class="btn" id="again">Try again</button><button class="btn secondary" onclick="go('${backHash}')">Done</button></div>`);
+  document.getElementById('again').onclick = again;
 }
 
-function setLgExample(type, A, a, b, p1, p2, M) {
-  document.getElementById('lg-type').value = type;
-  document.getElementById('lg-A').value = A;
-  document.getElementById('lg-a').value = a;
-  document.getElementById('lg-b').value = b;
-  document.getElementById('lg-p1').value = p1;
-  document.getElementById('lg-p2').value = p2;
-  document.getElementById('lg-M').value = M;
+function viewWeekly() {
+  setTitle('Weekly test practice', true);
+  render(`<h1>Weekly test practice</h1><p class="muted">Five questions, like the 10-minute tests in class. A new mix each time.</p>` +
+    [1, 2, 3, 4, 5].map(w => `<button class="tile" onclick="go('#/week/${w}')"><span class="badge">${bestBadge('week-' + w, 5)}</span>
+      <div class="t">Week ${w}</div><div class="s">${WEEK_TOPICS[w]}</div></button>`).join(''));
+}
+function viewWeek(w) {
+  w = +w; setTitle('Week ' + w + ' practice test', true);
+  const pool = SKILLS.filter(s => s.weeks.includes(w)).flatMap(s => s.qs);
+  render(`<h1>Week ${w} practice test</h1><p class="muted">${WEEK_TOPICS[w]} &middot; 5 questions &middot; aim for 10 minutes</p>
+    <div class="card">No notes or calculator: treat it like the real thing. Work on paper, then tap your answer.</div>
+    <button class="btn wide" id="start">Start</button>`);
+  document.getElementById('start').onclick = () => startWeek(w, pool);
+}
+function startWeek(w, pool) {
+  const t0 = Date.now();
+  runQuiz({ items: shuffle(pool).slice(0, 5),
+    done: st => { const mins = Math.round((Date.now() - t0) / 6000) / 10;
+      results('Week ' + w + ' practice test', st.score, 5, 'week-' + w, () => startWeek(w, pool), '#/weekly',
+        `<p class="muted" style="text-align:center">Time taken: ${mins} minutes</p>`); } });
 }
 
-function setHgExample(A, a, b) {
-  document.getElementById('hg-A').value = A;
-  document.getElementById('hg-a').value = a;
-  document.getElementById('hg-b').value = b;
+// ---------- exam questions ----------
+function viewExam(k) {
+  const P = PROBLEMS[k]; if (!P) return go('#/');
+  setTitle('Problem ' + k + ': ' + P.name, true);
+  const ex = GENERATE[k]();
+  render(`<h1><span class="letter">${k}</span>${esc(P.name)}</h1><p class="muted">${esc(P.lecture)} &middot; ${P.marks} marks &middot; a new version each time</p>
+    <div class="exam">${ex.question}</div>
+    <p class="muted">Try it on paper first. Then go through it step by step: each step is one part of the exam answer.</p>
+    <div class="row"><button class="btn" id="start">Start the steps</button><button class="btn secondary" id="another">New version</button></div>`);
+  document.getElementById('another').onclick = () => viewExam(k);
+  document.getElementById('start').onclick = () => runQuiz({ items: ex.steps, header: `<div class="exam" style="font-size:.9rem">${ex.short}</div>`,
+    done: st => {
+      const model = `<h2>Model answer</h2><div class="model">${ex.steps.map(s => { const a = s.opts.find(o => o.ok);
+        return `<div class="step"><b>${esc(s.part)}</b> ${a.svg ? '' : '<b>' + esc(a.t) + '</b><br>'}<span class="muted">${esc(s.why)}</span></div>`; }).join('')}</div>`;
+      results('Problem ' + k + ': marks', st.marks, P.marks, 'exam-' + k, () => viewExam(k), '#/', model);
+    } });
 }
+function opts(list) { return list.map((t, i) => ({ t: t, ok: i === 0 })); }
+function optsM(list) { return list.map((t, i) => ({ t: m(t), ok: i === 0 })); }
 
-// ================================================================
-// TAB 1: KEY FACTS QUIZ
-// ================================================================
-let kfScore = { correct: 0, total: 0 };
-
-function updateKfScore() {
-  document.getElementById('kf-score-text').textContent = `Score: ${kfScore.correct} / ${kfScore.total}`;
-  const pct = kfScore.total > 0 ? (kfScore.correct / kfScore.total * 100) : 0;
-  document.getElementById('kf-score-bar').style.width = pct + '%';
-}
-
-function generateKeyFactsQuiz() {
-  kfScore = { correct: 0, total: 0 };
-  updateKfScore();
-
-  const questions = [
-    // INDICES
-    { q: 'Simplify \\(x^3 \\cdot x^5\\)', opts: ['\\(x^{15}\\)', '\\(x^8\\)', '\\(x^2\\)', '\\(2x^8\\)'], ans: 1, expl: '\\(x^a \\cdot x^b = x^{a+b}\\), so \\(x^3 \\cdot x^5 = x^8\\).' },
-    { q: 'Simplify \\(\\dfrac{x^7}{x^3}\\)', opts: ['\\(x^{21}\\)', '\\(x^{10}\\)', '\\(x^4\\)', '\\(x^{7/3}\\)'], ans: 2, expl: '\\(x^a / x^b = x^{a-b}\\), so \\(x^{7-3} = x^4\\).' },
-    { q: 'Simplify \\((x^2)^4\\)', opts: ['\\(x^6\\)', '\\(x^8\\)', '\\(x^{16}\\)', '\\(2x^4\\)'], ans: 1, expl: '\\((x^a)^b = x^{ab}\\), so \\((x^2)^4 = x^8\\).' },
-    { q: 'What is \\(x^{-3}\\)?', opts: ['\\(-x^3\\)', '\\(\\frac{1}{x^3}\\)', '\\(\\frac{x}{3}\\)', '\\(x^{1/3}\\)'], ans: 1, expl: '\\(x^{-a} = \\frac{1}{x^a}\\).' },
-    { q: 'What is \\(8^{2/3}\\)?', opts: ['4', '6', '\\(\\frac{16}{3}\\)', '2'], ans: 0, expl: '\\(8^{2/3} = (\\sqrt[3]{8})^2 = 2^2 = 4\\).' },
-    { q: 'What is \\(5^0\\)?', opts: ['0', '5', '1', 'undefined'], ans: 2, expl: 'Any non-zero number raised to the power 0 equals 1.' },
-    // LOGS
-    { q: 'Simplify \\(\\ln(e^5)\\)', opts: ['\\(5e\\)', '5', '\\(e^5\\)', '1'], ans: 1, expl: '\\(\\ln(e^x) = x\\), so \\(\\ln(e^5) = 5\\).' },
-    { q: 'Simplify \\(\\ln a + \\ln b\\)', opts: ['\\(\\ln(a+b)\\)', '\\(\\ln(ab)\\)', '\\(\\ln a \\cdot \\ln b\\)', '\\((\\ln a)^b\\)'], ans: 1, expl: '\\(\\ln a + \\ln b = \\ln(ab)\\) by the product rule for logarithms.' },
-    { q: 'Simplify \\(\\ln(x^4)\\)', opts: ['\\(4\\ln x\\)', '\\(\\ln(4x)\\)', '\\(4 + \\ln x\\)', '\\((\\ln x)^4\\)'], ans: 0, expl: '\\(\\ln(x^n) = n\\ln x\\).' },
-    { q: 'What is \\(e^{\\ln 7}\\)?', opts: ['\\(\\ln 7\\)', '\\(7e\\)', '7', '1'], ans: 2, expl: '\\(e^{\\ln x} = x\\), so \\(e^{\\ln 7} = 7\\).' },
-    { q: 'What is \\(\\ln 1\\)?', opts: ['1', '0', '\\(e\\)', 'undefined'], ans: 1, expl: '\\(\\ln 1 = 0\\) because \\(e^0 = 1\\).' },
-    // DIFFERENTIATION
-    { q: 'Differentiate \\(f(x) = 5x^4\\)', opts: ['\\(20x^3\\)', '\\(5x^3\\)', '\\(20x^5\\)', '\\(4x^5\\)'], ans: 0, expl: 'Power rule: \\(\\frac{d}{dx}[5x^4] = 5 \\times 4 x^{4-1} = 20x^3\\).' },
-    { q: 'Differentiate \\(f(x) = e^{3x}\\)', opts: ['\\(e^{3x}\\)', '\\(3e^{3x}\\)', '\\(3xe^{3x}\\)', '\\(e^{3}\\)'], ans: 1, expl: 'Chain rule: \\(\\frac{d}{dx}[e^{3x}] = 3e^{3x}\\).' },
-    { q: 'Differentiate \\(f(x) = \\ln(2x)\\)', opts: ['\\(\\frac{2}{x}\\)', '\\(\\frac{1}{x}\\)', '\\(\\frac{1}{2x}\\)', '\\(2\\ln x\\)'], ans: 1, expl: '\\(\\frac{d}{dx}[\\ln(2x)] = \\frac{2}{2x} = \\frac{1}{x}\\). Or note \\(\\ln(2x) = \\ln 2 + \\ln x\\).' },
-    { q: 'If \\(f(x) = x^2 \\cdot e^x\\), what is \\(f\'(x)\\)?', opts: ['\\(2xe^x\\)', '\\(x^2 e^x\\)', '\\(2xe^x + x^2e^x\\)', '\\(e^x(2x+1)\\)'], ans: 2, expl: 'Product rule: \\(f\' = 2x \\cdot e^x + x^2 \\cdot e^x = e^x(2x + x^2)\\).' },
-    // STATIONARY POINTS 3D
-    { q: 'For \\(f(x,y)\\), if \\(H > 0\\) and \\(f_{xx} < 0\\), the point is a:', opts: ['Minimum', 'Maximum', 'Saddle point', 'Inconclusive'], ans: 1, expl: '\\(H > 0\\) and \\(f_{xx} < 0\\) means the point is a maximum.' },
-    { q: 'If the Hessian \\(H < 0\\), the stationary point is a:', opts: ['Maximum', 'Minimum', 'Saddle point', 'Inflection point'], ans: 2, expl: '\\(H < 0\\) always indicates a saddle point.' },
-    { q: 'The Hessian is \\(H = f_{xx}f_{yy} - (f_{xy})^2\\). If \\(f_{xx}=4, f_{yy}=3, f_{xy}=1\\), what is \\(H\\)?', opts: ['11', '13', '7', '12'], ans: 0, expl: '\\(H = 4 \\times 3 - 1^2 = 12 - 1 = 11\\).' },
-    { q: 'A function is concave at \\(x\\) when:', opts: ['\\(f\'(x) = 0\\)', '\\(f\'\'(x) > 0\\)', '\\(f\'\'(x) < 0\\)', '\\(f\'\'(x) = 0\\)'], ans: 2, expl: 'A function is concave where \\(f\'\'(x) < 0\\).' },
-  ];
-
-  // Shuffle and pick 10
-  const shuffled = questions.sort(() => Math.random() - 0.5).slice(0, 10);
-  const container = document.getElementById('kf-quiz-container');
-  container.innerHTML = '';
-  kfScore.total = shuffled.length;
-
-  shuffled.forEach((item, qi) => {
-    const div = document.createElement('div');
-    div.className = 'quiz-question';
-    div.innerHTML = `<div class="q-text">${qi + 1}. ${item.q}</div>
-      <div class="quiz-options" id="kf-opts-${qi}">
-        ${item.opts.map((o, oi) => `<div class="quiz-option" data-qi="${qi}" data-oi="${oi}" onclick="checkKfAnswer(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
-      </div>
-      <div class="quiz-feedback" id="kf-fb-${qi}" data-expl="${item.expl.replace(/"/g, '&quot;')}"></div>`;
-    container.appendChild(div);
-  });
-
-  retypeset(container);
-}
-
-function checkKfAnswer(el, qi, chosen, correct) {
-  const opts = document.querySelectorAll(`#kf-opts-${qi} .quiz-option`);
-  opts.forEach(o => { o.classList.add('disabled'); });
-  if (chosen === correct) {
-    el.classList.add('correct');
-    kfScore.correct++;
-    const fb = document.getElementById(`kf-fb-${qi}`);
-    fb.className = 'quiz-feedback correct';
-    fb.innerHTML = 'Correct! ' + fb.dataset.expl;
-  } else {
-    el.classList.add('incorrect');
-    opts[correct].classList.add('correct');
-    const fb = document.getElementById(`kf-fb-${qi}`);
-    fb.className = 'quiz-feedback incorrect';
-    fb.innerHTML = 'Incorrect. ' + fb.dataset.expl;
+const GENERATE = {
+  A() {
+    const v = pick(A_VARIANTS);
+    const f = m('f(x) = ' + v.f);
+    const question = `<p>Consider the function ${f}.</p><ol type="a">
+      <li>Find where the function crosses the \\(x\\)- and \\(y\\)-axes. <span class="marks">[3]</span></li>
+      <li>What happens to \\(f(x)\\) as \\(x \\to \\infty\\) and as \\(x \\to -\\infty\\)? <span class="marks">[2]</span></li>
+      <li>Find the stationary points (both coordinates). <span class="marks">[4]</span></li>
+      <li>Use the second derivative to determine their nature. <span class="marks">[4]</span></li>
+      <li>For which values of \\(x\\) is the function concave, and for which convex? <span class="marks">[3]</span></li>
+      <li>Sketch the function. <span class="marks">[4]</span></li></ol>`;
+    const limOrder = [v.lim].concat(Object.keys(LIMITS).filter(k => k !== v.lim));
+    const steps = [
+      { part: '(a)', marks: 3, q: `Where does ${f} cross the x-axis?`, opts: opts(v.roots), why: v.rootsWhy },
+      { part: '(b)', marks: 2, q: `What happens to ${f} as x gets very large (positive and negative)?`, opts: opts(limOrder.map(k => LIMITS[k])), why: v.limWhy },
+      { part: '(c)', marks: 2, q: `What is f'(x)?`, opts: opts(v.fp), why: R`Power rule on each term: \(f'(x) = ` + v.fp[0].slice(2, -2) + R`\).` },
+      { part: '(c)', marks: 2, q: `The stationary points are:`, opts: opts(v.sp), why: v.spWhy },
+      { part: '(d)', marks: 4, q: `Their nature is:`, opts: opts(v.nat), why: v.natWhy },
+      { part: '(e)', marks: 3, q: `Where is the function concave and where convex?`, opts: opts(v.conc), why: v.concWhy },
+      { part: '(f)', marks: 4, q: `Which is the sketch of ${f}?`, grid: true, opts: sketchOptions(v), why: R`Use (a) for the intercepts, (b) for the ends, (c)-(d) for the turning points and (e) for the bends.` }
+    ];
+    return { question, short: `${f}`, steps };
+  },
+  B() {
+    const v = pick(B_VARIANTS);
+    const Y = m('Y = ' + v.Y);
+    const question = `<p>A firm has production function ${Y}.</p><ol type="a">
+      <li>Use Euler's theorem to show that \\(Y\\) is homogeneous, and state its degree. <span class="marks">[5]</span></li>
+      <li>Show directly that \\(Y(\\lambda K, \\lambda L) = \\lambda^n Y(K, L)\\). <span class="marks">[3]</span></li>
+      <li>Does the firm have increasing, constant or decreasing returns to scale? If it doubled both inputs, what would happen to output? <span class="marks">[2]</span></li></ol>`;
+    const rtsList = ['increasing', 'constant', 'decreasing'];
+    const steps = [
+      { part: '(a)', marks: 1, q: R`What is \(\dfrac{\partial Y}{\partial K}\)?`, opts: optsM(v.YK), why: R`Treat \(L\) as a constant: bring the power of \(K\) down and reduce it by one.` },
+      { part: '(a)', marks: 1, q: R`What is \(\dfrac{\partial Y}{\partial L}\)?`, opts: optsM(v.YL), why: R`Treat \(K\) as a constant.` },
+      { part: '(a)', marks: 3, q: R`Simplify \(K\dfrac{\partial Y}{\partial K} + L\dfrac{\partial Y}{\partial L}\).`, opts: optsM(v.eul), why: v.eulWhy + R` So by Euler's theorem \(Y\) is homogeneous of degree \(${v.n}\).` },
+      { part: '(b)', marks: 3, q: R`\(Y(\lambda K, \lambda L)\) equals:`, opts: optsM(v.dir), why: R`Each input brings its power of \(\lambda\); add the powers: \(\lambda^{${v.n}}\).` },
+      { part: '(c)', marks: 1, q: `Returns to scale are:`, opts: opts([v.rts].concat(rtsList.filter(x => x !== v.rts)).map(x => x[0].toUpperCase() + x.slice(1))),
+        why: R`Degree \(${v.n}\): ` + (v.rts === 'constant' ? 'equal to 1.' : v.rts === 'increasing' ? 'more than 1.' : 'less than 1.') },
+      { part: '(c)', marks: 1, q: `If both inputs double, output is multiplied by:`, opts: opts(v.dbl), why: R`Multiply by \(2^n\) with \(n = ${v.n}\).` }
+    ];
+    return { question, short: Y, steps };
+  },
+  C() {
+    const v = pick(C_VARIANTS);
+    const g = m('g(x, y) = ' + v.g);
+    const question = `<p>Consider the function ${g}.</p><ol type="a">
+      <li>State the first-order conditions for a stationary point, and the second-order conditions for it to be a maximum, a minimum or a saddle point. <span class="marks">[4]</span></li>
+      <li>Show that \\(g\\) has a stationary point at \\(${v.pt}\\). <span class="marks">[3]</span></li>
+      <li>Find \\(g_{xx}\\), \\(g_{yy}\\), \\(g_{xy}\\) and \\(g_{yx}\\). <span class="marks">[4]</span></li>
+      <li>Determine the nature of the stationary point at \\(${v.pt}\\). <span class="marks">[4]</span></li></ol>`;
+    const natList = ['minimum', 'maximum', 'saddle point'];
+    const steps = [
+      { part: '(a)', marks: 1, q: `The first-order conditions are:`, opts: optsM([R`g_x = 0 \text{ and } g_y = 0`, R`g_{xx} = 0 \text{ and } g_{yy} = 0`, R`g(x, y) = 0`, R`g_x = g_y`]), why: R`The slope must be zero in both directions.` },
+      { part: '(a)', marks: 3, q: R`A stationary point is a maximum if (with \(D = g_{xx}g_{yy} - g_{xy}^2\)):`,
+        opts: optsM([R`g_{xx} < 0,\ g_{yy} < 0 \text{ and } D > 0`, R`g_{xx} < 0 \text{ and } g_{yy} < 0`, R`g_{xx} > 0,\ g_{yy} > 0 \text{ and } D > 0`, R`D < 0`]),
+        why: R`Max: \(g_{xx}, g_{yy} < 0\) and \(D > 0\). Min: \(g_{xx}, g_{yy} > 0\) and \(D > 0\). Saddle: \(D < 0\).` },
+      { part: '(b)', marks: 1, q: R`What is \(g_x\)?`, opts: optsM(v.gx), why: R`Treat \(y\) as a constant: \(\frac{\partial}{\partial x}e^{xy} = ye^{xy}\).` },
+      { part: '(b)', marks: 1, q: R`What is \(g_y\)?`, opts: optsM(v.gy), why: R`Treat \(x\) as a constant: \(\frac{\partial}{\partial y}e^{xy} = xe^{xy}\).` },
+      { part: '(b)', marks: 1, q: R`At \(${v.pt}\), every \(e^{xy}\) term equals:`, opts: optsM(['1', '0', 'e', R`e^{x}`]), why: R`\(xy = 0\) there and \(e^0 = 1\). So ` + v.chk + R`: a stationary point.` },
+      { part: '(c)', marks: 2, q: R`What is \(g_{xy}\) (which equals \(g_{yx}\))?`, opts: optsM(v.gxy), why: R`Differentiate \(g_x\) with respect to \(y\), using the product rule. Also ` + v.sec + '.' },
+      { part: '(c)', marks: 2, q: R`At \(${v.pt}\), the second-order partials are:`, opts: opts(v.val), why: v.sec + R`, evaluated with \(e^{xy} = 1\).` },
+      { part: '(d)', marks: 2, q: R`\(D = g_{xx}g_{yy} - g_{xy}^2\) at the point is:`, opts: optsM(v.D), why: v.natWhy },
+      { part: '(d)', marks: 2, q: `So the point is a:`, opts: opts([v.nat].concat(natList.filter(x => x !== v.nat)).concat(['cannot tell'])), why: v.natWhy }
+    ];
+    return { question, short: g + ' at ' + m(v.pt), steps };
+  },
+  D() {
+    const c = pick(D_COST), u = pick(D_UTIL);
+    const F = m('F(K, L) = ' + c.F), U = m('u(x, y) = ' + u.u);
+    const question = `<p><b>(a)</b> A firm has production function ${F}. The rental rate of capital is \\(r = ${c.r}\\) and the wage is \\(w = ${c.w}\\). It wants to produce ${c.y} units at minimum cost.</p>
+      <ol type="i"><li>Write down the firm's problem and the Lagrangian. <span class="marks">[3]</span></li>
+      <li>Find the first-order conditions. <span class="marks">[3]</span></li>
+      <li>Find the cost-minimising \\(K\\) and \\(L\\), and the minimum cost. <span class="marks">[4]</span></li></ol>
+      <p><b>(b)</b> A consumer has utility ${U}, prices \\(p_x = ${u.px}\\), \\(p_y = ${u.py}\\) and income ${u.m}. Use the Lagrangian method to find her optimal bundle. It is recommended that you take logs of the utility function. <span class="marks">[10]</span></p>`;
+    const cf = n => (n === 1 ? '' : String(n));
+    const lag = [R`${cf(c.r)}K + ${cf(c.w)}L - \lambda\left(${c.F} - ${c.y}\right)`, R`${c.F} - \lambda(${cf(c.r)}K + ${cf(c.w)}L - ${c.y})`,
+                 R`${cf(c.w)}K + ${cf(c.r)}L - \lambda\left(${c.F} - ${c.y}\right)`, R`${cf(c.r)}K + ${cf(c.w)}L - \lambda\left(${c.F}\right)`];
+    const ulag = [R`\mathcal{L} = ${u.logs[0]} - \lambda(${cf(u.px)}x + ${cf(u.py)}y - ${u.m})`, R`\mathcal{L} = ${u.logs[0]} - \lambda(${cf(u.py)}x + ${cf(u.px)}y - ${u.m})`,
+                  R`\mathcal{L} = ${cf(u.px)}x + ${cf(u.py)}y - \lambda\left(${u.logs[0]} - ${u.m}\right)`, R`\mathcal{L} = ${u.logs[0]} - \lambda(${cf(u.px)}x + ${cf(u.py)}y)`];
+    const steps = [
+      { part: '(a)(i)', marks: 3, q: R`Which is the right Lagrangian \(\mathcal{L}\)?`, opts: optsM(lag), why: R`Minimise cost \(${cf(c.r)}K + ${cf(c.w)}L\) subject to \(${c.F} = ${c.y}\): \(\mathcal{L} = \text{cost} - \lambda(\text{output} - ${c.y})\).` },
+      { part: '(a)(ii)', marks: 3, q: R`The first-order condition \(\mathcal{L}_K = 0\) gives:`, opts: optsM(c.foc), why: R`Differentiate with respect to \(K\): the rental rate equals \(\lambda\) times the marginal product of capital.` },
+      { part: '(a)(iii)', marks: 2, q: R`Dividing the first two FOCs (so \(\lambda\) cancels) gives:`, opts: optsM(c.ratio), why: c.ratioWhy },
+      { part: '(a)(iii)', marks: 1, q: `Substituting into the output constraint:`, opts: optsM(c.KL), why: c.KLWhy },
+      { part: '(a)(iii)', marks: 1, q: `The minimum cost is:`, opts: optsM(c.cost), why: c.costWhy },
+      { part: '(b)', marks: 2, q: R`Taking logs, \(\ln u\) is:`, opts: optsM(u.logs), why: R`The log of a product is a sum of logs, and powers come out in front.` },
+      { part: '(b)', marks: 1, q: `So the Lagrangian is:`, opts: optsM(ulag), why: R`Objective (in logs) minus \(\lambda\) times (spending minus income).` },
+      { part: '(b)', marks: 2, q: `The first-order conditions for x and y are:`, opts: optsM(u.foc), why: R`Differentiate: \(\frac{\partial}{\partial x}(a\ln x) = \frac{a}{x}\), which must equal \(\lambda p_x\).` },
+      { part: '(b)', marks: 2, q: R`Eliminating \(\lambda\) gives:`, opts: optsM(u.ratio), why: u.ratioWhy },
+      { part: '(b)', marks: 3, q: `So the optimal bundle is:`, opts: optsM(u.xy), why: u.xyWhy }
+    ];
+    return { question, short: `(a) ${F}, r = ${c.r}, w = ${c.w}, ${c.y} units. (b) ${U}, prices ${u.px} and ${u.py}, income ${u.m}.`, steps };
   }
-  updateKfScore();
-  retypeset(document.getElementById(`kf-fb-${qi}`));
-}
+};
+// the question text in exam steps contains maths that must not be escaped
+['A', 'B', 'C', 'D'].forEach(k => { const g = GENERATE[k]; GENERATE[k] = () => { const ex = g(); ex.steps.forEach(s => s.html = true); return ex; }; });
 
-// ================================================================
-// TAB 2: GRAPH DRAWING
-// ================================================================
-function drawGraph() {
-  hideError('graph-error');
-  const funcStr = document.getElementById('graph-func').value.trim();
-  const xmin = parseFloat(document.getElementById('graph-xmin').value);
-  const xmax = parseFloat(document.getElementById('graph-xmax').value);
-
-  if (!funcStr) { showError('graph-error', 'Please enter a function.'); return; }
-  if (isNaN(xmin) || isNaN(xmax) || xmin >= xmax) { showError('graph-error', 'Invalid x range.'); return; }
-
-  // Compile function
-  let compiled;
-  try {
-    compiled = math.compile(funcStr);
-    compiled.evaluate({ x: 0 }); // test
-  } catch (e) {
-    showError('graph-error', 'Could not parse function. Check syntax. Use * for multiplication.');
-    return;
+// ---------- sketches for problem A ----------
+function plotSVG(fn, dom) {
+  const W = 200, H = 140, pad = 10, N = 160, xs = [], ys = [];
+  for (let i = 0; i <= N; i++) { const x = dom[0] + (dom[1] - dom[0]) * i / N; xs.push(x); ys.push(fn(x)); }
+  let lo = Math.min(...ys, 0), hi = Math.max(...ys, 0); const sp = (hi - lo) || 1; lo -= 0.08 * sp; hi += 0.08 * sp;
+  const X = x => pad + (W - 2 * pad) * (x - dom[0]) / (dom[1] - dom[0]);
+  const Y = y => H - pad - (H - 2 * pad) * (y - lo) / (hi - lo);
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s += `<line x1="${pad}" y1="${Y(0)}" x2="${W - pad}" y2="${Y(0)}" stroke="#8a94a6" stroke-width="1"/>`;
+  if (dom[0] < 0 && dom[1] > 0) s += `<line x1="${X(0)}" y1="${pad - 4}" x2="${X(0)}" y2="${H - pad + 4}" stroke="#8a94a6" stroke-width="1"/>`;
+  for (let t = Math.ceil(dom[0]); t <= Math.floor(dom[1]); t++) {
+    if (t === 0) continue;
+    s += `<line x1="${X(t)}" y1="${Y(0) - 2.5}" x2="${X(t)}" y2="${Y(0) + 2.5}" stroke="#8a94a6"/><text x="${X(t)}" y="${Y(0) + 11}" font-size="8" text-anchor="middle" fill="#5b6576">${t}</text>`;
   }
-
-  // Generate points
-  const n = 500;
-  const xs = [], ys = [];
-  const step = (xmax - xmin) / n;
-  for (let i = 0; i <= n; i++) {
-    const xv = xmin + i * step;
-    try {
-      const yv = compiled.evaluate({ x: xv });
-      if (isFinite(yv) && Math.abs(yv) < 1e10) {
-        xs.push(xv);
-        ys.push(yv);
-      } else {
-        xs.push(xv);
-        ys.push(null);
-      }
-    } catch {
-      xs.push(xv);
-      ys.push(null);
-    }
+  s += `<polyline fill="none" stroke="#13807a" stroke-width="2.2" points="${xs.map((x, i) => X(x).toFixed(1) + ',' + Y(ys[i]).toFixed(1)).join(' ')}"/></svg>`;
+  return s;
+}
+function sketchOptions(v) {
+  const f = v.fn, d = v.dom, cands = [x => -f(x), x => f(-x), x => f(x - 1), x => -f(-x), x => f(x + 1), x => f(x) - 0.5 * Math.abs(f(d[1]))];
+  const sample = g => { const a = []; for (let i = 0; i <= 40; i++) a.push(g(d[0] + (d[1] - d[0]) * i / 40)); return a; };
+  const scale = Math.max(...sample(f).map(Math.abs)) || 1;
+  const chosen = [f];
+  for (const g of cands) {
+    if (chosen.length === 4) break;
+    const sg = sample(g);
+    if (chosen.every(h => { const sh = sample(h); return Math.max(...sh.map((y, i) => Math.abs(y - sg[i]))) > 0.15 * scale; })) chosen.push(g);
   }
-
-  Plotly.newPlot('graph-plot', [{
-    x: xs, y: ys, type: 'scatter', mode: 'lines',
-    line: { color: '#3182ce', width: 2.5 },
-    connectgaps: false
-  }], {
-    xaxis: { title: 'x', zeroline: true, zerolinecolor: '#aaa', zerolinewidth: 1 },
-    yaxis: { title: 'f(x)', zeroline: true, zerolinecolor: '#aaa', zerolinewidth: 1 },
-    margin: { t: 20, r: 20 },
-    height: 380,
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)'
-  }, { responsive: true });
-
-  // 7-point analysis
-  doSevenPointAnalysis(funcStr, compiled, xmin, xmax);
+  return chosen.map((g, i) => ({ t: plotSVG(g, d), ok: i === 0, svg: true }));
 }
 
-function doSevenPointAnalysis(funcStr, compiled, xmin, xmax) {
-  const out = document.getElementById('graph-analysis');
-  out.classList.add('visible');
-
-  let html = '';
-
-  // 1. y-intercept
-  try {
-    const y0 = compiled.evaluate({ x: 0 });
-    html += `<div class="step"><div class="step-label">Step 1: Y-intercept (x = 0)</div>
-      \\(f(0) = ${fmtNum(y0)}\\), so the curve crosses the y-axis at \\((0,\\, ${fmtNum(y0)})\\).</div>`;
-  } catch {
-    html += `<div class="step"><div class="step-label">Step 1: Y-intercept</div>Function may not be defined at \\(x=0\\).</div>`;
-  }
-
-  // 2. x-intercepts (numerical)
-  const xIntercepts = findRoots(compiled, xmin, xmax);
-  if (xIntercepts.length > 0) {
-    const rootStr = xIntercepts.map(r => `\\(${fmtNum(r)}\\)`).join(', ');
-    html += `<div class="step"><div class="step-label">Step 2: X-intercepts (y = 0)</div>
-      The function crosses the x-axis at approximately: x = ${rootStr}.</div>`;
-  } else {
-    html += `<div class="step"><div class="step-label">Step 2: X-intercepts</div>No real x-intercepts found in the given range.</div>`;
-  }
-
-  // 3. Undefined points
-  html += `<div class="step"><div class="step-label">Step 3: Undefined points</div>Check whether the function has any discontinuities or asymptotes in the given range.</div>`;
-
-  // 4 & 5. Limits
-  try {
-    const yAtMin = compiled.evaluate({ x: xmin });
-    const yAtMax = compiled.evaluate({ x: xmax });
-    const bigNeg = compiled.evaluate({ x: -1000 });
-    const bigPos = compiled.evaluate({ x: 1000 });
-    html += `<div class="step"><div class="step-label">Step 4: Behaviour at extremes</div>
-      As \\(x \\to -\\infty\\): \\(f(x) \\to ${isFinite(bigNeg) ? fmtNum(bigNeg) : (bigNeg > 0 ? '+\\infty' : '-\\infty')}\\)<br>
-      As \\(x \\to +\\infty\\): \\(f(x) \\to ${isFinite(bigPos) ? fmtNum(bigPos) : (bigPos > 0 ? '+\\infty' : '-\\infty')}\\)</div>`;
-  } catch {
-    html += `<div class="step"><div class="step-label">Step 4: Behaviour at extremes</div>Could not evaluate limits.</div>`;
-  }
-
-  // 5 & 6. Stationary points (numerical)
-  let derivative;
-  try {
-    const dExpr = math.derivative(funcStr, 'x');
-    derivative = dExpr;
-    const dStr = dExpr.toString();
-
-    // Find where derivative = 0
-    const statPts = findRoots(math.compile(dStr), xmin, xmax);
-
-    if (statPts.length > 0) {
-      let spHtml = '';
-      // Second derivative
-      let d2Expr;
-      try { d2Expr = math.derivative(dStr, 'x'); } catch { d2Expr = null; }
-
-      statPts.forEach(sp => {
-        const yVal = compiled.evaluate({ x: sp });
-        let nature = 'unknown';
-        if (d2Expr) {
-          const d2Val = d2Expr.evaluate({ x: sp });
-          if (d2Val < -1e-8) nature = 'local maximum';
-          else if (d2Val > 1e-8) nature = 'local minimum';
-          else nature = 'inflection point (or higher-order)';
-        }
-        spHtml += `\\((${fmtNum(sp)},\\, ${fmtNum(yVal)})\\) &mdash; ${nature}<br>`;
-      });
-
-      html += `<div class="step"><div class="step-label">Step 5: Stationary points (f'(x) = 0)</div>
-        \\(f'(x) = ${dStr}\\)<br><br>${spHtml}</div>`;
-
-      // Concavity
-      if (d2Expr) {
-        const d2Str = d2Expr.toString();
-        html += `<div class="step"><div class="step-label">Step 6: Concavity (f''(x))</div>
-          \\(f''(x) = ${d2Str}\\)<br>
-          The function is <strong>concave</strong> where \\(f''(x) < 0\\) and <strong>convex</strong> where \\(f''(x) > 0\\).</div>`;
-      }
-    } else {
-      html += `<div class="step"><div class="step-label">Step 5: Stationary points</div>No stationary points found in the given range.</div>`;
-    }
-  } catch (e) {
-    html += `<div class="step"><div class="step-label">Step 5: Stationary points</div>Could not compute derivative symbolically. Try a simpler function.</div>`;
-  }
-
-  // 7. Sketch summary
-  html += `<div class="step"><div class="step-label">Step 7: Sketch</div>
-    Use all the information above to sketch the function. The graph is plotted above for reference.</div>`;
-
-  out.innerHTML = html;
-  retypeset(out);
+// ---------- router ----------
+function route() {
+  const h = location.hash || '#/';
+  const p = h.slice(2).split('/');
+  if (p[0] === 'skills') viewSkills();
+  else if (p[0] === 'skill') viewSkill(p[1]);
+  else if (p[0] === 'weekly') viewWeekly();
+  else if (p[0] === 'week') viewWeek(p[1]);
+  else if (p[0] === 'exam' && p[1]) viewExam(p[1]);
+  else viewHome();
 }
-
-function findRoots(compiled, xmin, xmax, n = 2000) {
-  const roots = [];
-  const step = (xmax - xmin) / n;
-  let prevY;
-  try { prevY = compiled.evaluate({ x: xmin }); } catch { prevY = NaN; }
-
-  for (let i = 1; i <= n; i++) {
-    const xv = xmin + i * step;
-    let yv;
-    try { yv = compiled.evaluate({ x: xv }); } catch { yv = NaN; }
-
-    if (isFinite(prevY) && isFinite(yv) && prevY * yv <= 0) {
-      // Bisection
-      let lo = xv - step, hi = xv;
-      for (let j = 0; j < 50; j++) {
-        const mid = (lo + hi) / 2;
-        const mVal = compiled.evaluate({ x: mid });
-        if (Math.abs(mVal) < 1e-12) { lo = hi = mid; break; }
-        const loVal = compiled.evaluate({ x: lo });
-        if (loVal * mVal < 0) hi = mid; else lo = mid;
-      }
-      const root = round((lo + hi) / 2, 4);
-      if (roots.length === 0 || Math.abs(root - roots[roots.length - 1]) > 0.01) {
-        roots.push(root);
-      }
-    }
-    prevY = yv;
-  }
-  return roots;
-}
-
-function clearGraph() {
-  document.getElementById('graph-plot').innerHTML = '';
-  document.getElementById('graph-analysis').innerHTML = '';
-  document.getElementById('graph-analysis').classList.remove('visible');
-  hideError('graph-error');
-}
-
-// Graph Quiz
-let gdScore = { correct: 0, total: 0 };
-
-function updateGdScore() {
-  document.getElementById('gd-score-text').textContent = `Score: ${gdScore.correct} / ${gdScore.total}`;
-  const pct = gdScore.total > 0 ? (gdScore.correct / gdScore.total * 100) : 0;
-  document.getElementById('gd-score-bar').style.width = pct + '%';
-}
-
-function generateGraphQuiz() {
-  gdScore = { correct: 0, total: 0 };
-  updateGdScore();
-
-  const problems = [
-    { func: 'x^3 - 6*x^2 + 9*x', display: 'f(x) = x^3 - 6x^2 + 9x',
-      questions: [
-        { q: 'What is \\(f(0)\\)?', ans: '0', type: 'input' },
-        { q: 'How many stationary points does this function have?', opts: ['0','1','2','3'], ans: 2, type: 'mc' },
-        { q: 'Where does \\(f(x) \\to\\) as \\(x \\to +\\infty\\)?', opts: ['\\(+\\infty\\)','\\(-\\infty\\)','0','undefined'], ans: 0, type: 'mc' },
-        { q: 'The function crosses the x-axis at \\(x = 0\\) and \\(x =\\) ?', ans: '3', type: 'input' },
-      ]},
-    { func: 'x^4 - 8*x^2 + 12', display: 'f(x) = x^4 - 8x^2 + 12',
-      questions: [
-        { q: 'What is \\(f(0)\\)?', ans: '12', type: 'input' },
-        { q: 'Where does \\(f(x) \\to\\) as \\(x \\to -\\infty\\)?', opts: ['\\(+\\infty\\)','\\(-\\infty\\)','0','12'], ans: 0, type: 'mc' },
-        { q: 'How many stationary points does this function have?', opts: ['1','2','3','4'], ans: 2, type: 'mc' },
-      ]},
-    { func: 'x^3 - 3*x + 2', display: 'f(x) = x^3 - 3x + 2',
-      questions: [
-        { q: 'What is \\(f(0)\\)?', ans: '2', type: 'input' },
-        { q: 'The derivative \\(f\'(x) = 3x^2 - 3\\). Stationary points are at \\(x =\\) ?', opts: ['\\(x = \\pm 1\\)','\\(x = 0\\)','\\(x = \\pm 3\\)','\\(x = 3\\)'], ans: 0, type: 'mc' },
-        { q: 'At \\(x = -1\\), is it a max or min?', opts: ['Maximum','Minimum','Saddle','Inflection'], ans: 0, type: 'mc' },
-        { q: 'At \\(x = 1\\), is it a max or min?', opts: ['Maximum','Minimum','Saddle','Inflection'], ans: 1, type: 'mc' },
-      ]},
-  ];
-
-  const prob = problems[Math.floor(Math.random() * problems.length)];
-  const container = document.getElementById('gd-quiz-container');
-  gdScore.total = prob.questions.length;
-
-  let html = `<div class="quiz-question"><div class="q-text">Consider the function \\(${prob.display}\\)</div></div>`;
-
-  prob.questions.forEach((item, qi) => {
-    if (item.type === 'mc') {
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-options" id="gd-opts-${qi}">
-          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkGdMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
-        </div>
-        <div class="quiz-feedback" id="gd-fb-${qi}"></div></div>`;
-    } else {
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-input-row">
-          <input type="text" id="gd-input-${qi}" placeholder="Your answer">
-          <button class="btn btn-primary" onclick="checkGdInput(${qi}, '${item.ans}')">Check</button>
-        </div>
-        <div class="quiz-feedback" id="gd-fb-${qi}"></div></div>`;
-    }
-  });
-
-  container.innerHTML = html;
-  retypeset(container);
-}
-
-function checkGdMc(el, qi, chosen, correct) {
-  const opts = document.querySelectorAll(`#gd-opts-${qi} .quiz-option`);
-  opts.forEach(o => o.classList.add('disabled'));
-  const fb = document.getElementById(`gd-fb-${qi}`);
-  if (chosen === correct) {
-    el.classList.add('correct');
-    gdScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.textContent = 'Correct!';
-  } else {
-    el.classList.add('incorrect');
-    opts[correct].classList.add('correct');
-    fb.className = 'quiz-feedback incorrect';
-    fb.textContent = 'Incorrect.';
-  }
-  updateGdScore();
-}
-
-function checkGdInput(qi, correct) {
-  const input = document.getElementById(`gd-input-${qi}`);
-  const fb = document.getElementById(`gd-fb-${qi}`);
-  const val = input.value.trim();
-  input.disabled = true;
-  if (val === correct || Math.abs(parseFloat(val) - parseFloat(correct)) < 0.01) {
-    gdScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.textContent = 'Correct!';
-  } else {
-    fb.className = 'quiz-feedback incorrect';
-    fb.innerHTML = `Incorrect. The answer is ${correct}.`;
-  }
-  updateGdScore();
-}
-
-// ================================================================
-// TAB 3: LAGRANGIAN SOLVER
-// ================================================================
-function solveLagrangian() {
-  hideError('lg-error');
-  const type = document.getElementById('lg-type').value;
-  const A = parseFloat(document.getElementById('lg-A').value);
-  const a = parseFloat(document.getElementById('lg-a').value);
-  const b = parseFloat(document.getElementById('lg-b').value);
-  const p1 = parseFloat(document.getElementById('lg-p1').value);
-  const p2 = parseFloat(document.getElementById('lg-p2').value);
-  const M = parseFloat(document.getElementById('lg-M').value);
-
-  if ([A, a, b, p1, p2, M].some(isNaN) || p1 === 0 || p2 === 0) {
-    showError('lg-error', 'Please fill in all fields with valid numbers. Prices must be non-zero.');
-    return;
-  }
-
-  const sign = type === 'max' ? '+' : '-';
-  const signWord = type === 'max' ? 'maximise' : 'minimise';
-  const signLambda = type === 'max' ? '-' : '+'; // Lagrangian sign convention
-  const lambdaSign = type === 'min' ? '+' : '-';
-
-  // Build display strings
-  const Astr = A === 1 ? '' : fmtNum(A);
-  const funcDisplay = `${Astr}x^{${fmtNum(a)}} y^{${fmtNum(b)}}`;
-  const constraintDisplay = `${fmtNum(p1)}x + ${fmtNum(p2)}y = ${fmtNum(M)}`;
-
-  // Step 1: Write the Lagrangian
-  // For minimisation: L = objective + λ(M - p1*x - p2*y)
-  // For maximisation: L = objective - λ(p1*x + p2*y - M)
-  // We'll use the convention: L = f(x,y) + λ(M - p1*x - p2*y) for both
-  const lagDisplay = `${funcDisplay} + \\lambda(${fmtNum(M)} - ${fmtNum(p1)}x - ${fmtNum(p2)}y)`;
-
-  // Step 2: FOCs
-  // dL/dx = A*a*x^(a-1)*y^b - λ*p1 = 0
-  // dL/dy = A*b*x^a*y^(b-1) - λ*p2 = 0
-  // dL/dλ = M - p1*x - p2*y = 0
-
-  // From FOC1: λ = A*a*x^(a-1)*y^b / p1
-  // From FOC2: λ = A*b*x^a*y^(b-1) / p2
-  // Setting equal: A*a*x^(a-1)*y^b / p1 = A*b*x^a*y^(b-1) / p2
-  // Simplify: a*y / (p1) = b*x / (p2)
-  // So: x = (a*p2*y) / (b*p1)
-
-  // Sub into constraint: p1 * (a*p2*y)/(b*p1) + p2*y = M
-  // a*p2*y/b + p2*y = M
-  // p2*y*(a/b + 1) = M
-  // p2*y*((a+b)/b) = M
-  // y* = M*b / (p2*(a+b))
-  // x* = M*a / (p1*(a+b))
-
-  const xStar = (M * a) / (p1 * (a + b));
-  const yStar = (M * b) / (p2 * (a + b));
-
-  // Lambda
-  const lambdaStar = (A * a * Math.pow(xStar, a - 1) * Math.pow(yStar, b)) / p1;
-
-  // Optimal value
-  const fStar = A * Math.pow(xStar, a) * Math.pow(yStar, b);
-
-  const out = document.getElementById('lg-solution');
-  out.classList.add('visible');
-
-  out.innerHTML = `
-    <div class="step">
-      <div class="step-label">Problem Setup</div>
-      ${signWord} \\(f(x,y) = ${funcDisplay}\\) subject to \\(${constraintDisplay}\\)
-    </div>
-
-    <div class="step">
-      <div class="step-label">Step 1: Write the Lagrangian</div>
-      \\[\\mathcal{L} = ${lagDisplay}\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Step 2: First Order Conditions</div>
-      \\[\\frac{\\partial \\mathcal{L}}{\\partial x} = ${fmtNum(A * a)} \\, x^{${fmtNum(a - 1)}} \\, y^{${fmtNum(b)}} - ${fmtNum(p1)}\\lambda = 0 \\quad \\cdots (1)\\]
-      \\[\\frac{\\partial \\mathcal{L}}{\\partial y} = ${fmtNum(A * b)} \\, x^{${fmtNum(a)}} \\, y^{${fmtNum(b - 1)}} - ${fmtNum(p2)}\\lambda = 0 \\quad \\cdots (2)\\]
-      \\[\\frac{\\partial \\mathcal{L}}{\\partial \\lambda} = ${fmtNum(M)} - ${fmtNum(p1)}x - ${fmtNum(p2)}y = 0 \\quad \\cdots (3)\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Step 3: Solve for the ratio</div>
-      From (1): \\(\\lambda = \\dfrac{${fmtNum(A * a)} \\, x^{${fmtNum(a - 1)}} \\, y^{${fmtNum(b)}}}{${fmtNum(p1)}}\\)<br><br>
-      From (2): \\(\\lambda = \\dfrac{${fmtNum(A * b)} \\, x^{${fmtNum(a)}} \\, y^{${fmtNum(b - 1)}}}{${fmtNum(p2)}}\\)<br><br>
-      Setting these equal and simplifying:<br>
-      \\[\\frac{${fmtNum(a)} \\cdot y}{${fmtNum(p1)}} = \\frac{${fmtNum(b)} \\cdot x}{${fmtNum(p2)}}\\]
-      \\[x = \\frac{${fmtNum(a)} \\cdot ${fmtNum(p2)}}{${fmtNum(b)} \\cdot ${fmtNum(p1)}} \\, y = ${fmtNum((a * p2) / (b * p1))} \\, y\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Step 4: Substitute into constraint</div>
-      \\[${fmtNum(p1)} \\cdot ${fmtNum((a * p2) / (b * p1))} y + ${fmtNum(p2)} y = ${fmtNum(M)}\\]
-      \\[${fmtNum(p1 * (a * p2) / (b * p1))} y + ${fmtNum(p2)} y = ${fmtNum(M)}\\]
-      \\[${fmtNum(p1 * (a * p2) / (b * p1) + p2)} y = ${fmtNum(M)}\\]
-      \\[y^* = ${fmtNum(yStar)}\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Step 5: Find x*</div>
-      \\[x^* = ${fmtNum((a * p2) / (b * p1))} \\times ${fmtNum(yStar)} = ${fmtNum(xStar)}\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Result</div>
-      <strong>Optimal values:</strong> \\(x^* = ${fmtNum(xStar)}\\), \\(y^* = ${fmtNum(yStar)}\\)<br>
-      <strong>Optimal function value:</strong> \\(f(x^*, y^*) = ${fmtNum(fStar)}\\)<br>
-      <strong>Lagrange multiplier:</strong> \\(\\lambda^* = ${fmtNum(lambdaStar, 4)}\\)
-    </div>`;
-
-  retypeset(out);
-}
-
-function clearLagrangian() {
-  document.getElementById('lg-solution').innerHTML = '';
-  document.getElementById('lg-solution').classList.remove('visible');
-  hideError('lg-error');
-}
-
-// Lagrangian Quiz
-let lgScore = { correct: 0, total: 0 };
-
-function updateLgScore() {
-  document.getElementById('lg-score-text').textContent = `Score: ${lgScore.correct} / ${lgScore.total}`;
-  const pct = lgScore.total > 0 ? (lgScore.correct / lgScore.total * 100) : 0;
-  document.getElementById('lg-score-bar').style.width = pct + '%';
-}
-
-function generateLagrangianQuiz() {
-  lgScore = { correct: 0, total: 0 };
-  updateLgScore();
-
-  // Generate a random Cobb-Douglas problem
-  const problems = [
-    { A: 1, a: 0.5, b: 0.5, p1: 10, p2: 15, M: 120, type: 'min',
-      context: 'A firm has production function \\(f(K,L) = K^{0.5}L^{0.5}\\). The rental rate of capital is 10 and the wage rate is 15. The firm must produce 120 units and wants to minimise costs.' },
-    { A: 1, a: 0.5, b: 0.5, p1: 2, p2: 3, M: 100, type: 'max',
-      context: 'A consumer has utility function \\(U(x_1, x_2) = x_1^{0.5} x_2^{0.5}\\). The price of good 1 is 2 and the price of good 2 is 3. Their budget is 100.' },
-    { A: 1, a: 0.25, b: 0.75, p1: 40, p2: 10, M: 100, type: 'min',
-      context: 'A firm has production function \\(f(K,L) = K^{0.25}L^{0.75}\\). The wage rate is 40 and the rental rate of capital is 10. The firm must produce 100 units.' },
-    { A: 2, a: 0.5, b: 0.5, p1: 4, p2: 6, M: 200, type: 'max',
-      context: 'Maximise \\(U(x_1, x_2) = 2x_1^{0.5} x_2^{0.5}\\) subject to \\(4x_1 + 6x_2 = 200\\).' },
-  ];
-
-  const prob = problems[Math.floor(Math.random() * problems.length)];
-
-  // Compute answers
-  const xStar = round((prob.M * prob.a) / (prob.p1 * (prob.a + prob.b)), 2);
-  const yStar = round((prob.M * prob.b) / (prob.p2 * (prob.a + prob.b)), 2);
-
-  const container = document.getElementById('lg-quiz-container');
-  lgScore.total = 4;
-
-  const questions = [
-    { q: `In the Lagrangian, what is the correct expression for the first FOC (\\(\\partial \\mathcal{L}/\\partial x = 0\\))?<br><br>What coefficient multiplies \\(\\lambda\\) in this equation?`,
-      ans: String(prob.p1), type: 'input', expl: `The FOC w.r.t. x gives: \\(${fmtNum(prob.A * prob.a)} x^{${fmtNum(prob.a - 1)}} y^{${fmtNum(prob.b)}} - ${prob.p1}\\lambda = 0\\). So the coefficient is ${prob.p1}.` },
-    { q: `When you set the two FOC expressions for \\(\\lambda\\) equal, what is the relationship between x and y?<br><br>Specifically, \\(x = k \\cdot y\\). What is \\(k\\) (to 2 d.p.)?`,
-      ans: String(round((prob.a * prob.p2) / (prob.b * prob.p1), 2)), type: 'input', expl: `\\(k = \\frac{a \\cdot p_2}{b \\cdot p_1} = \\frac{${fmtNum(prob.a)} \\times ${fmtNum(prob.p2)}}{${fmtNum(prob.b)} \\times ${fmtNum(prob.p1)}} = ${fmtNum((prob.a * prob.p2) / (prob.b * prob.p1))}\\)` },
-    { q: `What is the optimal value of \\(x^*\\) (to 2 d.p.)?`,
-      ans: String(xStar), type: 'input', expl: `\\(x^* = \\frac{M \\cdot a}{p_1(a+b)} = \\frac{${fmtNum(prob.M)} \\times ${fmtNum(prob.a)}}{${fmtNum(prob.p1)} \\times ${fmtNum(prob.a + prob.b)}} = ${fmtNum(xStar)}\\)` },
-    { q: `What is the optimal value of \\(y^*\\) (to 2 d.p.)?`,
-      ans: String(yStar), type: 'input', expl: `\\(y^* = \\frac{M \\cdot b}{p_2(a+b)} = \\frac{${fmtNum(prob.M)} \\times ${fmtNum(prob.b)}}{${fmtNum(prob.p2)} \\times ${fmtNum(prob.a + prob.b)}} = ${fmtNum(yStar)}\\)` },
-  ];
-
-  let html = `<div class="quiz-question"><div class="q-text">${prob.context}</div></div>`;
-
-  questions.forEach((item, qi) => {
-    html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-      <div class="quiz-input-row">
-        <input type="text" id="lg-input-${qi}" placeholder="Your answer">
-        <button class="btn btn-primary" onclick="checkLgInput(${qi}, '${item.ans}', '${item.expl.replace(/'/g, "\\'")}')">Check</button>
-      </div>
-      <div class="quiz-feedback" id="lg-fb-${qi}"></div></div>`;
-  });
-
-  container.innerHTML = html;
-  retypeset(container);
-}
-
-function checkLgInput(qi, correct, expl) {
-  const input = document.getElementById(`lg-input-${qi}`);
-  const fb = document.getElementById(`lg-fb-${qi}`);
-  const val = input.value.trim();
-  input.disabled = true;
-
-  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
-    lgScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.innerHTML = 'Correct! ' + expl;
-  } else {
-    fb.className = 'quiz-feedback incorrect';
-    fb.innerHTML = `Incorrect. The answer is ${correct}. ` + expl;
-  }
-  updateLgScore();
-  retypeset(fb);
-}
-
-// ================================================================
-// TAB 4: 3D STATIONARY POINTS
-// ================================================================
-function solveStationaryPoints() {
-  hideError('sp-error');
-  const funcStr = document.getElementById('sp-func').value.trim();
-  if (!funcStr) { showError('sp-error', 'Please enter a function.'); return; }
-
-  try {
-    // Use Nerdamer for symbolic differentiation
-    const fx = nerdamer.diff(funcStr, 'x').toString();
-    const fy = nerdamer.diff(funcStr, 'y').toString();
-    const fxx = nerdamer.diff(fx, 'x').toString();
-    const fyy = nerdamer.diff(fy, 'y').toString();
-    const fxy = nerdamer.diff(fx, 'y').toString();
-
-    // Try to solve the system fx = 0, fy = 0
-    let solutions = [];
-    try {
-      const solX = nerdamer.solveEquations([fx + '=0', fy + '=0'], ['x', 'y']);
-      if (solX && solX.length > 0) {
-        if (Array.isArray(solX[0])) {
-          // Multiple solutions format: [[x, val], [y, val]]
-          // nerdamer returns pairs, need to parse
-          for (let i = 0; i < solX.length; i++) {
-            if (Array.isArray(solX[i]) && solX[i].length === 2) {
-              // Format: [['x', val], ['y', val]]
-              if (solX[i][0] === 'x' || solX[i][0] === 'y') {
-                // This is a paired solution
-                if (i + 1 < solX.length) {
-                  const xVal = solX[i][0] === 'x' ? parseFloat(nerdamer(solX[i][1]).evaluate().text()) : parseFloat(nerdamer(solX[i + 1][1]).evaluate().text());
-                  const yVal = solX[i][0] === 'y' ? parseFloat(nerdamer(solX[i][1]).evaluate().text()) : parseFloat(nerdamer(solX[i + 1][1]).evaluate().text());
-                  if (isFinite(xVal) && isFinite(yVal)) {
-                    solutions.push({ x: xVal, y: yVal });
-                  }
-                  i++; // skip paired entry
-                }
-              }
-            }
-          }
-        }
-      }
-    } catch {
-      // Fallback: try numerical approach for common function types
-      solutions = numericalSolve2D(fx, fy, -10, 10, -10, 10);
-    }
-
-    // If no solutions found, try numerical
-    if (solutions.length === 0) {
-      solutions = numericalSolve2D(fx, fy, -10, 10, -10, 10);
-    }
-
-    // Classify each stationary point
-    let classificationHtml = '';
-    if (solutions.length > 0) {
-      solutions.forEach((sol, i) => {
-        const fxxVal = safeEval(fxx.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
-        const fyyVal = safeEval(fyy.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
-        const fxyVal = safeEval(fxy.replace(/x/g, `(${sol.x})`).replace(/y/g, `(${sol.y})`), {});
-
-        // Use math.js for evaluation
-        let fxxV, fyyV, fxyV, fVal;
-        try {
-          fxxV = math.evaluate(fxx, { x: sol.x, y: sol.y });
-          fyyV = math.evaluate(fyy, { x: sol.x, y: sol.y });
-          fxyV = math.evaluate(fxy, { x: sol.x, y: sol.y });
-          fVal = math.evaluate(funcStr, { x: sol.x, y: sol.y });
-        } catch {
-          fxxV = fxxVal; fyyV = fyyVal; fxyV = fxyVal; fVal = NaN;
-        }
-
-        const H = fxxV * fyyV - fxyV * fxyV;
-        let nature = '';
-        if (H > 1e-8 && fxxV < -1e-8) nature = 'Local Maximum';
-        else if (H > 1e-8 && fxxV > 1e-8) nature = 'Local Minimum';
-        else if (H < -1e-8) nature = 'Saddle Point';
-        else nature = 'Inconclusive (H = 0)';
-
-        classificationHtml += `
-          <div class="step">
-            <div class="step-label">Point ${i + 1}: \\((${fmtNum(sol.x)}, ${fmtNum(sol.y)})\\)</div>
-            \\(f(${fmtNum(sol.x)}, ${fmtNum(sol.y)}) = ${fmtNum(fVal)}\\)<br><br>
-            \\(f_{xx} = ${fmtNum(fxxV)}\\), \\(f_{yy} = ${fmtNum(fyyV)}\\), \\(f_{xy} = ${fmtNum(fxyV)}\\)<br><br>
-            \\(H = f_{xx} \\cdot f_{yy} - (f_{xy})^2 = ${fmtNum(fxxV)} \\times ${fmtNum(fyyV)} - (${fmtNum(fxyV)})^2 = ${fmtNum(H)}\\)<br><br>
-            <strong>Classification: ${nature}</strong>
-          </div>`;
-      });
-    } else {
-      classificationHtml = '<div class="step">No stationary points found. Try a different function or check the input.</div>';
-    }
-
-    const out = document.getElementById('sp-solution');
-    out.classList.add('visible');
-    out.innerHTML = `
-      <div class="step">
-        <div class="step-label">Step 1: Partial Derivatives</div>
-        \\[f_x = ${fx}\\]
-        \\[f_y = ${fy}\\]
-      </div>
-      <div class="step">
-        <div class="step-label">Step 2: Second Partial Derivatives</div>
-        \\[f_{xx} = ${fxx}\\]
-        \\[f_{yy} = ${fyy}\\]
-        \\[f_{xy} = ${fxy}\\]
-      </div>
-      <div class="step">
-        <div class="step-label">Step 3: Solve \\(f_x = 0\\) and \\(f_y = 0\\)</div>
-        Setting both partial derivatives to zero and solving simultaneously:
-      </div>
-      ${classificationHtml}`;
-
-    retypeset(out);
-
-  } catch (e) {
-    showError('sp-error', 'Error: Could not process the function. Make sure to use * for multiplication (e.g., 3*x*y, not 3xy). Error: ' + e.message);
-  }
-}
-
-function numericalSolve2D(fxStr, fyStr, xMin, xMax, yMin, yMax) {
-  const solutions = [];
-  const gridSize = 20;
-  const stepX = (xMax - xMin) / gridSize;
-  const stepY = (yMax - yMin) / gridSize;
-
-  for (let i = 0; i <= gridSize; i++) {
-    for (let j = 0; j <= gridSize; j++) {
-      let xg = xMin + i * stepX;
-      let yg = yMin + j * stepY;
-
-      // Newton's method
-      for (let iter = 0; iter < 30; iter++) {
-        let vx, vy;
-        try {
-          vx = math.evaluate(fxStr, { x: xg, y: yg });
-          vy = math.evaluate(fyStr, { x: xg, y: yg });
-        } catch { break; }
-
-        if (!isFinite(vx) || !isFinite(vy)) break;
-        if (Math.abs(vx) < 1e-10 && Math.abs(vy) < 1e-10) {
-          // Found a solution - check it's not a duplicate
-          const isDup = solutions.some(s => Math.abs(s.x - xg) < 0.01 && Math.abs(s.y - yg) < 0.01);
-          if (!isDup && isFinite(xg) && isFinite(yg)) {
-            solutions.push({ x: round(xg, 4), y: round(yg, 4) });
-          }
-          break;
-        }
-
-        // Numerical Jacobian
-        const h = 1e-7;
-        let fxx_n, fxy_n, fyx_n, fyy_n;
-        try {
-          fxx_n = (math.evaluate(fxStr, { x: xg + h, y: yg }) - vx) / h;
-          fxy_n = (math.evaluate(fxStr, { x: xg, y: yg + h }) - vx) / h;
-          fyx_n = (math.evaluate(fyStr, { x: xg + h, y: yg }) - vy) / h;
-          fyy_n = (math.evaluate(fyStr, { x: xg, y: yg + h }) - vy) / h;
-        } catch { break; }
-
-        const det = fxx_n * fyy_n - fxy_n * fyx_n;
-        if (Math.abs(det) < 1e-15) break;
-
-        xg -= (fyy_n * vx - fxy_n * vy) / det;
-        yg -= (-fyx_n * vx + fxx_n * vy) / det;
-
-        if (!isFinite(xg) || !isFinite(yg) || Math.abs(xg) > 1e6 || Math.abs(yg) > 1e6) break;
-      }
-    }
-  }
-  return solutions;
-}
-
-function clearStationary() {
-  document.getElementById('sp-solution').innerHTML = '';
-  document.getElementById('sp-solution').classList.remove('visible');
-  hideError('sp-error');
-}
-
-// Stationary Points Quiz
-let spScore = { correct: 0, total: 0 };
-
-function updateSpScore() {
-  document.getElementById('sp-score-text').textContent = `Score: ${spScore.correct} / ${spScore.total}`;
-  const pct = spScore.total > 0 ? (spScore.correct / spScore.total * 100) : 0;
-  document.getElementById('sp-score-bar').style.width = pct + '%';
-}
-
-function generateStationaryQuiz() {
-  spScore = { correct: 0, total: 0 };
-  updateSpScore();
-
-  const problems = [
-    { func: 'x^2 + y^2 - 4*x - 6*y + 13', display: 'f(x,y) = x^2 + y^2 - 4x - 6y + 13',
-      fx: '2x - 4', fy: '2y - 6', sp: {x: 2, y: 3}, fxx: 2, fyy: 2, fxy: 0, H: 4, nature: 'Minimum' },
-    { func: '-x^2 - y^2 + 2*x + 4*y', display: 'f(x,y) = -x^2 - y^2 + 2x + 4y',
-      fx: '-2x + 2', fy: '-2y + 4', sp: {x: 1, y: 2}, fxx: -2, fyy: -2, fxy: 0, H: 4, nature: 'Maximum' },
-    { func: 'x^2 - y^2', display: 'f(x,y) = x^2 - y^2',
-      fx: '2x', fy: '-2y', sp: {x: 0, y: 0}, fxx: 2, fyy: -2, fxy: 0, H: -4, nature: 'Saddle Point' },
-    { func: 'x^2 + x*y + y^2 - 3*x', display: 'f(x,y) = x^2 + xy + y^2 - 3x',
-      fx: '2x + y - 3', fy: 'x + 2y', sp: {x: 2, y: -1}, fxx: 2, fyy: 2, fxy: 1, H: 3, nature: 'Minimum' },
-  ];
-
-  const prob = problems[Math.floor(Math.random() * problems.length)];
-  const container = document.getElementById('sp-quiz-container');
-  spScore.total = 5;
-
-  let html = `<div class="quiz-question"><div class="q-text">Find and classify the stationary point(s) of \\(${prob.display}\\).</div></div>`;
-
-  const questions = [
-    { q: `What is \\(f_x\\)?`, opts: [prob.fx, prob.fy, '0', `${prob.fxx}x`], ans: 0, type: 'mc' },
-    { q: `At the stationary point, what is the value of \\(x\\)?`, ans: String(prob.sp.x), type: 'input' },
-    { q: `At the stationary point, what is the value of \\(y\\)?`, ans: String(prob.sp.y), type: 'input' },
-    { q: `What is the value of the Hessian \\(H = f_{xx}f_{yy} - (f_{xy})^2\\)?`, ans: String(prob.H), type: 'input' },
-    { q: `What is the nature of this stationary point?`, opts: ['Minimum', 'Maximum', 'Saddle Point', 'Inconclusive'], ans: ['Minimum','Maximum','Saddle Point','Inconclusive'].indexOf(prob.nature), type: 'mc' },
-  ];
-
-  questions.forEach((item, qi) => {
-    if (item.type === 'mc') {
-      // Shuffle options for non-answer questions
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-options" id="sp-opts-${qi}">
-          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkSpMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
-        </div>
-        <div class="quiz-feedback" id="sp-fb-${qi}"></div></div>`;
-    } else {
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-input-row">
-          <input type="text" id="sp-input-${qi}" placeholder="Your answer">
-          <button class="btn btn-primary" onclick="checkSpInput(${qi}, '${item.ans}')">Check</button>
-        </div>
-        <div class="quiz-feedback" id="sp-fb-${qi}"></div></div>`;
-    }
-  });
-
-  container.innerHTML = html;
-  retypeset(container);
-}
-
-function checkSpMc(el, qi, chosen, correct) {
-  const opts = document.querySelectorAll(`#sp-opts-${qi} .quiz-option`);
-  opts.forEach(o => o.classList.add('disabled'));
-  const fb = document.getElementById(`sp-fb-${qi}`);
-  if (chosen === correct) {
-    el.classList.add('correct');
-    spScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.textContent = 'Correct!';
-  } else {
-    el.classList.add('incorrect');
-    opts[correct].classList.add('correct');
-    fb.className = 'quiz-feedback incorrect';
-    fb.textContent = 'Incorrect.';
-  }
-  updateSpScore();
-}
-
-function checkSpInput(qi, correct) {
-  const input = document.getElementById(`sp-input-${qi}`);
-  const fb = document.getElementById(`sp-fb-${qi}`);
-  const val = input.value.trim();
-  input.disabled = true;
-  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
-    spScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.textContent = 'Correct!';
-  } else {
-    fb.className = 'quiz-feedback incorrect';
-    fb.textContent = `Incorrect. The answer is ${correct}.`;
-  }
-  updateSpScore();
-}
-
-// ================================================================
-// TAB 5: HOMOGENEITY
-// ================================================================
-function solveHomogeneity() {
-  hideError('hg-error');
-  const A = parseFloat(document.getElementById('hg-A').value);
-  const a = parseFloat(document.getElementById('hg-a').value);
-  const b = parseFloat(document.getElementById('hg-b').value);
-
-  if ([A, a, b].some(isNaN)) {
-    showError('hg-error', 'Please fill in all fields with valid numbers.');
-    return;
-  }
-
-  const degree = a + b;
-  const Astr = A === 1 ? '' : fmtNum(A);
-  const funcDisplay = `${Astr}x^{${fmtNum(a)}} y^{${fmtNum(b)}}`;
-
-  // Partial derivatives
-  // f_x = A * a * x^(a-1) * y^b
-  // f_y = A * b * x^a * y^(b-1)
-  const fxCoeff = A * a;
-  const fyCoeff = A * b;
-
-  // Euler's check: x*f_x + y*f_y should equal n*f
-  // x * A*a*x^(a-1)*y^b + y * A*b*x^a*y^(b-1)
-  // = A*a*x^a*y^b + A*b*x^a*y^b
-  // = A(a+b)*x^a*y^b
-  // = (a+b) * f(x,y)
-
-  let rts = '';
-  if (degree > 1) rts = 'Increasing returns to scale. Doubling inputs more than doubles output.';
-  else if (degree === 1) rts = 'Constant returns to scale. Doubling inputs exactly doubles output.';
-  else rts = 'Decreasing returns to scale. Doubling inputs less than doubles output.';
-
-  const out = document.getElementById('hg-solution');
-  out.classList.add('visible');
-  out.innerHTML = `
-    <div class="step">
-      <div class="step-label">Function</div>
-      \\[f(x,y) = ${funcDisplay}\\]
-    </div>
-
-    <div class="step">
-      <div class="step-label">Method 1: Euler's Theorem</div>
-      <p>Euler's theorem states: if \\(f\\) is homogeneous of degree \\(n\\), then \\(x\\,f_x + y\\,f_y = n\\,f(x,y)\\).</p><br>
-      <strong>Partial derivatives:</strong><br>
-      \\[f_x = ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a - 1)}}\\, y^{${fmtNum(b)}}\\]
-      \\[f_y = ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b - 1)}}\\]
-      <br><strong>Euler's check:</strong><br>
-      \\[x \\cdot f_x + y \\cdot f_y = x \\cdot ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a - 1)}}\\, y^{${fmtNum(b)}} + y \\cdot ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b - 1)}}\\]
-      \\[= ${fmtNum(fxCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}} + ${fmtNum(fyCoeff)}\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
-      \\[= (${fmtNum(fxCoeff)} + ${fmtNum(fyCoeff)})\\, x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
-      \\[= ${fmtNum(a + b)} \\cdot ${Astr || ''}x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}} = ${fmtNum(degree)} \\cdot f(x,y)\\]
-      <br>This confirms the function is <strong>homogeneous of degree ${fmtNum(degree)}</strong>.
-    </div>
-
-    <div class="step">
-      <div class="step-label">Method 2: Scaling Method</div>
-      <p>Replace \\(x\\) with \\(tx\\) and \\(y\\) with \\(ty\\):</p><br>
-      \\[f(tx, ty) = ${Astr}(tx)^{${fmtNum(a)}}(ty)^{${fmtNum(b)}}\\]
-      \\[= ${Astr}\\, t^{${fmtNum(a)}}\\, x^{${fmtNum(a)}} \\cdot t^{${fmtNum(b)}}\\, y^{${fmtNum(b)}}\\]
-      \\[= t^{${fmtNum(a)} + ${fmtNum(b)}} \\cdot ${Astr}x^{${fmtNum(a)}}\\, y^{${fmtNum(b)}}\\]
-      \\[= t^{${fmtNum(degree)}} \\cdot f(x,y)\\]
-      <br>Since \\(f(tx, ty) = t^{${fmtNum(degree)}} f(x,y)\\), the function is <strong>homogeneous of degree ${fmtNum(degree)}</strong>.
-    </div>
-
-    <div class="step">
-      <div class="step-label">Returns to Scale</div>
-      The degree of homogeneity is \\(n = ${fmtNum(degree)}\\).<br><br>
-      <strong>${rts}</strong>
-    </div>`;
-
-  retypeset(out);
-}
-
-function clearHomogeneity() {
-  document.getElementById('hg-solution').innerHTML = '';
-  document.getElementById('hg-solution').classList.remove('visible');
-  hideError('hg-error');
-}
-
-// Homogeneity Quiz
-let hgScore = { correct: 0, total: 0 };
-
-function updateHgScore() {
-  document.getElementById('hg-score-text').textContent = `Score: ${hgScore.correct} / ${hgScore.total}`;
-  const pct = hgScore.total > 0 ? (hgScore.correct / hgScore.total * 100) : 0;
-  document.getElementById('hg-score-bar').style.width = pct + '%';
-}
-
-function generateHomogeneityQuiz() {
-  hgScore = { correct: 0, total: 0 };
-  updateHgScore();
-
-  // Generate random Cobb-Douglas
-  const coeffs = [
-    { A: 1, a: 0.5, b: 0.5 },
-    { A: 1, a: 0.75, b: 0.75 },
-    { A: 2, a: 0.3, b: 0.7 },
-    { A: 1, a: 0.25, b: 0.75 },
-    { A: 3, a: 0.5, b: 1 },
-    { A: 1, a: 0.6, b: 0.4 },
-    { A: 5, a: 0.8, b: 0.4 },
-  ];
-
-  const c = coeffs[Math.floor(Math.random() * coeffs.length)];
-  const degree = c.a + c.b;
-  const Astr = c.A === 1 ? '' : c.A;
-  const funcDisplay = `f(x,y) = ${Astr}x^{${fmtNum(c.a)}} y^{${fmtNum(c.b)}}`;
-
-  let rtsAnswer;
-  if (degree > 1) rtsAnswer = 'Increasing';
-  else if (degree === 1) rtsAnswer = 'Constant';
-  else rtsAnswer = 'Decreasing';
-
-  const container = document.getElementById('hg-quiz-container');
-  hgScore.total = 4;
-
-  let html = `<div class="quiz-question"><div class="q-text">Consider the function \\(${funcDisplay}\\)</div></div>`;
-
-  const questions = [
-    { q: `What is \\(f_x\\)? What is the coefficient (the number multiplying the rest)?`,
-      ans: String(round(c.A * c.a, 4)), type: 'input',
-      expl: `\\(f_x = ${fmtNum(c.A * c.a)} x^{${fmtNum(c.a - 1)}} y^{${fmtNum(c.b)}}\\), so the coefficient is ${fmtNum(c.A * c.a)}.` },
-    { q: `When you compute \\(x \\cdot f_x + y \\cdot f_y\\), what multiple of \\(f(x,y)\\) do you get? (i.e., what is the degree of homogeneity?)`,
-      ans: String(round(degree, 4)), type: 'input',
-      expl: `The degree is \\(a + b = ${fmtNum(c.a)} + ${fmtNum(c.b)} = ${fmtNum(degree)}\\).` },
-    { q: `If the firm doubles its inputs, by what factor does output change?`,
-      ans: String(round(Math.pow(2, degree), 4)), type: 'input',
-      expl: `With degree \\(n = ${fmtNum(degree)}\\), doubling inputs multiplies output by \\(2^{${fmtNum(degree)}} = ${fmtNum(Math.pow(2, degree))}\\).` },
-    { q: `What type of returns to scale does this function exhibit?`,
-      opts: ['Increasing', 'Constant', 'Decreasing'], ans: ['Increasing','Constant','Decreasing'].indexOf(rtsAnswer), type: 'mc' },
-  ];
-
-  questions.forEach((item, qi) => {
-    if (item.type === 'mc') {
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-options" id="hg-opts-${qi}">
-          ${item.opts.map((o, oi) => `<div class="quiz-option" onclick="checkHgMc(this, ${qi}, ${oi}, ${item.ans})">${o}</div>`).join('')}
-        </div>
-        <div class="quiz-feedback" id="hg-fb-${qi}"></div></div>`;
-    } else {
-      html += `<div class="quiz-question"><div class="q-text">${qi + 1}. ${item.q}</div>
-        <div class="quiz-input-row">
-          <input type="text" id="hg-input-${qi}" placeholder="Your answer">
-          <button class="btn btn-primary" onclick="checkHgInput(${qi}, '${item.ans}', \`${item.expl}\`)">Check</button>
-        </div>
-        <div class="quiz-feedback" id="hg-fb-${qi}"></div></div>`;
-    }
-  });
-
-  container.innerHTML = html;
-  retypeset(container);
-}
-
-function checkHgMc(el, qi, chosen, correct) {
-  const opts = document.querySelectorAll(`#hg-opts-${qi} .quiz-option`);
-  opts.forEach(o => o.classList.add('disabled'));
-  const fb = document.getElementById(`hg-fb-${qi}`);
-  if (chosen === correct) {
-    el.classList.add('correct');
-    hgScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.textContent = 'Correct!';
-  } else {
-    el.classList.add('incorrect');
-    opts[correct].classList.add('correct');
-    fb.className = 'quiz-feedback incorrect';
-    fb.textContent = 'Incorrect.';
-  }
-  updateHgScore();
-}
-
-function checkHgInput(qi, correct, expl) {
-  const input = document.getElementById(`hg-input-${qi}`);
-  const fb = document.getElementById(`hg-fb-${qi}`);
-  const val = input.value.trim();
-  input.disabled = true;
-  if (Math.abs(parseFloat(val) - parseFloat(correct)) < 0.05) {
-    hgScore.correct++;
-    fb.className = 'quiz-feedback correct';
-    fb.innerHTML = 'Correct! ' + expl;
-  } else {
-    fb.className = 'quiz-feedback incorrect';
-    fb.innerHTML = `Incorrect. The answer is ${correct}. ` + expl;
-  }
-  updateHgScore();
-  retypeset(fb);
-}
-
-// ================================================================
-// INITIALISE
-// ================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  // Generate initial quizzes
-  generateKeyFactsQuiz();
-
-  // Enter key triggers solve/plot in input fields
-  document.getElementById('graph-func').addEventListener('keydown', e => { if (e.key === 'Enter') drawGraph(); });
-  document.getElementById('sp-func').addEventListener('keydown', e => { if (e.key === 'Enter') solveStationaryPoints(); });
-});
+window.addEventListener('hashchange', route);
+route();
 </script>
 </body>
 </html>
